@@ -73,7 +73,7 @@ def defaultdict_factory():
 def estimate_prior_knowledge(frame, difficulties):
     """Estimates prior_knowledge of one user
     """
-<<<<<<< HEAD:libs/analysis.py
+
     first = first_questions(frame)
     prior_skill= (0,0)
 
@@ -114,29 +114,6 @@ def estimate_current_knowledge(answers, skills, difficulties):
 
         skills[answer.place_asked] = (update[0], skills[answer.place_asked][1]+1)
     return skills
-=======
-
-    first = first_questions(frame.groupby(['user','session_number']))
-    first = first.set_index('user')
-
-    places = defaultdict(inputoutput.defaultdict_factory)
-    users  = defaultdict(inputoutput.defaultdict_factory)
-
-    for row in first.iterrows():
-        answer_user = row[0]
-        answer_place = row[1]['place_asked']
-
-        user = users[(answer_user,answer_place)]
-        place = places[answer_place]
-        update = elo(row[1],user[0],user[1],place[0],place[1])
-
-        users[(answer_user,answer_place)] = [update[0],user[1]+1]
-        places[answer_place] = [update[1],place[1]+1]
-
-    if path:
-        inputoutput.save_difficulties(places,path)
-    return places
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:analysis.py
 
 
 def difficulty_probabilities(difficulties):
@@ -146,11 +123,7 @@ def difficulty_probabilities(difficulties):
     result = []
     for item in difficulties.iteritems():
         result += [_logis(-item[1][0])]
-<<<<<<< HEAD:libs/analysis.py
     return Series(result,index=difficulties.keys())
-=======
-    return pd.Series(result,index=difficulties.keys())
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:analysis.py
 
 
 def success_probabilities(skills,difficulties):
@@ -160,12 +133,7 @@ def success_probabilities(skills,difficulties):
     result = []
     for item in skills.iteritems():
         result += [_logis(item[1][0] - difficulties[item[0]][0])]
-<<<<<<< HEAD:libs/analysis.py
     return Series(result,index=skills.keys())
-=======
-    result = pd.Series(result,index=skills.keys())
-    return result
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:analysis.py
 
 
 ################################################################################
@@ -323,7 +291,6 @@ def mean_success_session(frame, threshold=None):
 def prior_skill_session(frame, difficulties, codes):
     """
     """
-<<<<<<< HEAD:libs/analysis.py
 
     #first = first_questions(frame.groupby('session_number'))
 
@@ -343,29 +310,3 @@ def answers_percentages(frame, threshold=None):
         return mistaken
     else:
         return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))
-=======
-
-    first = first_questions(frame.groupby(['session_number']))
-    first = first.set_index('user')
-    result = []
-    skills = defaultdict(inputoutput.defaultdict_factory)
-
-    if threshold is None:
-        limit = first.session_number.max()+1
-    else:
-        limit = threshold
-
-    for i in range(0,limit):
-        temp = first[first.session_number==i]
-        for row in temp.iterrows():
-            answer_user = row[0]
-            answer_place = row[1]['place_asked']
-            user = skills[answer_place]
-            place = difficulties[answer_place]
-
-            update = elo(row[1],user[0],user[1],place[0],place[1])
-            skills[answer_place] = (update[0],user[1]+1)
-
-        result += [success_probabilities(skills,difficulties).mean()]
-    return (pd.Series(result),skills)
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:analysis.py

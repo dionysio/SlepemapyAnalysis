@@ -117,13 +117,8 @@ def jenks_classification(data, classes=8):
 
 class Map(Drawable):
 
-<<<<<<< HEAD:libs/map.py
     def __init__(   self, path='', df=None, user=None, place_asked=None,
                     bounds = (50, 236), prior = None, codes=None):
-=======
-    def __init__(   self, path='',codes=None, difficulties = None, df=None, user=None, place_asked=None,
-                    lower_bound = 50, upper_bound = 236, session_numbers=True):
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
         """Draws world map by default. All other defaults are same as in Drawable.
         
         :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
@@ -134,11 +129,7 @@ class Map(Drawable):
         config ={
             "layers": {
                 "states": {
-<<<<<<< HEAD:libs/map.py
                     "src": self.current_directory+"/data/ne_110m_admin_1_countries/ne_110m_admin_0_countries.shp",
-=======
-                    "src": self.current_dir+"/ne_110m_admin_1_countries/ne_110m_admin_0_countries.shp",
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
                     "filter": ["continent", "in", ["Europe","Asia","Africa","South America","Oceania","North America"]],
                     "class": "states"
                 }
@@ -152,10 +143,6 @@ class Map(Drawable):
     def set_config(self,config):
         self.config = config
 
-<<<<<<< HEAD:libs/map.py
-=======
-
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
     @staticmethod
     def bin_data(data,binning_function=None,number_of_bins=6,
             additional_countries=None,additional_labels=[],colour_range="YlOrRd"):
@@ -178,11 +165,7 @@ class Map(Drawable):
         binned.columns=['country','counts']
 
         bins = binning_function(binned['counts'],number_of_bins)
-<<<<<<< HEAD:libs/map.py
         binned['bin'] = cut(binned['counts'], bins=bins,labels=False)
-=======
-        binned['bin'] = pd.cut(binned['counts'], bins=bins,labels=False)
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
 
         if colour_range == 'RdYlGn':
             colours = colorbrewer.RdYlGn[len(bins)-1] #Red, Yellow, Green
@@ -288,11 +271,7 @@ class Map(Drawable):
 
 
     def draw_map(self,path,title='',colours=None):
-<<<<<<< HEAD:libs/map.py
         """General drawing method through kartograph. Looks for css in current_directory+'/style.css' for styling css.
-=======
-        """General drawing method through kartograph. Looks for css in current_dir+'/style.css' for styling css.
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
 
         :param path: output directory
         :param title: name of map
@@ -430,11 +409,7 @@ class Map(Drawable):
         self.draw_map(path+'success.svg','Mean success rate',colours)
 
 
-<<<<<<< HEAD:libs/map.py
-    def skill(self,binning_function=None,path='',number_of_bins=6,threshold=None):
-=======
     def skill(self,binning_function=None,path='',number_of_bins=6):
->>>>>>> 101963544307ed1c158181f775020dd1a28a530e:map.py
         """Draws map of skill per country.
 
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
