@@ -32,7 +32,7 @@ def first_questions(frame):
     """Returns first questions for every session.
     """
 
-    return frame.groupby('session_number').apply(lambda x: x.drop_duplicates(['place_asked']))
+    return frame.apply(lambda x: x.drop_duplicates(['place_asked']))
 
 
 def _logis(value):
@@ -74,7 +74,7 @@ def estimate_prior_knowledge(frame, difficulties):
     """Estimates prior_knowledge of one user
     """
 
-    first = first_questions(frame)
+    first = first_questions(frame.groupby('session_number'))
     prior_skill= (0,0)
 
     for index, answer in first.iterrows():
@@ -103,17 +103,20 @@ def calculate_difficulties(frame):
         prior_skill[answer.user] = (update[0], prior_skill[answer.user][1]+1)
         difficulties[answer.place_asked] = (update[1], difficulties[answer.place_asked][1]+1)
 
-    return difficulties
+    return (difficulties, prior_skill)
 
 
-def estimate_current_knowledge(answers, skills, difficulties):
-    for index,answer in answers.iterrows():
+def estimate_current_knowledge(frame, difficulties):
+
+    prior_skill = estimate_prior_knowledge(frame,difficulties)
+    current_skill  = defaultdict(lambda : (prior_skill[0],0))
+    for index,answer in frame.iterrows():
         update = elo(answer, 
-            skills[answer.place_asked][0], skills[answer.place_asked][1],
+            current_skill[answer.place_asked][0], current_skill[answer.place_asked][1],
             difficulties[answer.place_asked][0], difficulties[answer.place_asked][1])
 
-        skills[answer.place_asked] = (update[0], skills[answer.place_asked][1]+1)
-    return skills
+        current_skill[answer.place_asked] = (update[0], current_skill[answer.place_asked][1]+1)
+    return current_skill
 
 
 def difficulty_probabilities(difficulties):
@@ -292,8 +295,6 @@ def prior_skill_session(frame, difficulties, codes):
     """
     """
 
-    #first = first_questions(frame.groupby('session_number'))
-
     first = frame
     first.place_map = frame.place_map.fillna(225)
     first['place_type'] = first.apply(lambda x: codes[codes.id==x.place_asked]['type'].values[0],axis=1)
@@ -309,4 +310,15 @@ def answers_percentages(frame, threshold=None):
     if threshold is None:
         return mistaken
     else:
-        return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))
+        return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))   
+
+
+def success_rate_inserted(frame):
+    return frame.groupby('user').apply(lambda x: (len(x[x.place_asked==x.place_answered])/float(len(x)),x.inserted.values[0]))
+
+
+def number_of_users(frame):
+    times = frame.groupby('user').apply(lambda x: x.inserted.values[0])
+    times = times.reset_index()
+    times.index = DatetimeIndex(times[0])
+    return times.resample('M',how=len)['user']

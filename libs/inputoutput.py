@@ -3,9 +3,8 @@
 from numpy import uint32,uint16,uint8,float16
 from pandas import read_csv
 from yaml import dump,load
-from collections import defaultdict
 
-from analysis import estimate_prior_knowledge,add_session_numbers, defaultdict_factory
+from analysis import calculate_difficulties,add_session_numbers
 
 from argparse import ArgumentParser
 from os import path
@@ -79,10 +78,10 @@ def arguments(directory, require_items=True):
         prior = load_prior(path=working_directory+'/data/prior.yaml')
     else:
         frame = add_session_numbers(frame)
-        prior = calculate_difficulties(frame)
+        prior = calculate_difficulties(frame)[0]
         save_prior(prior,working_directory+'/data/prior.yaml')
     
     if require_items:
         return (args.items, frame, prior, codes, working_directory)
     else:
-        return (None, frame, prior, working_directory)
+        return (None, frame, prior, codes, working_directory)

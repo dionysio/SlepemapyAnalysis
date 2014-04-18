@@ -9,7 +9,7 @@ from os import path,makedirs
 (items, frame, prior, codes, working_directory) = arguments(path.dirname(path.realpath(__file__)), True)
 
 for item in items:
-    g = Graph(working_directory, frame, user=int(item), prior = prior)
+    g = Graph(working_directory, frame, user=int(item), prior = prior, codes=codes)
 
     directory = working_directory+'/graphs/user/'+item+'/'
     if not path.exists(directory):

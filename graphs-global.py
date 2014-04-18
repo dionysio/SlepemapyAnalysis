@@ -8,7 +8,7 @@ from os import path,makedirs
 
 (items, frame, prior, codes, working_directory) = arguments(path.dirname(path.realpath(__file__)), False)
 
-g = Graph(working_directory, frame, prior = prior)
+g = Graph(working_directory, frame, prior = prior, codes=codes)
 
 directory = working_directory+'/graphs/global/'
 if not path.exists(directory):

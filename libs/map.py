@@ -124,7 +124,7 @@ class Map(Drawable):
         :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
         """
 
-        Drawable.__init__(self,path,df,user,place_asked,bounds,prior)
+        Drawable.__init__(self,path,df,user,place_asked,bounds,prior,codes)
 
         config ={
             "layers": {
@@ -359,27 +359,7 @@ class Map(Drawable):
 
         if not path:
             path = self.current_directory+'/maps/'
-        data = analysis.difficulty_probabilities(self.prior[1])[self.bounds[0]:self.bounds[1]]
-        colours = None
-
-        if not data.empty:
-            (data,colours) = self.bin_data(data,binning_function,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
-
-        self.draw_map(path+'difficulty.svg','Difficulty for an average user',colours)
-
-
-    def difficultyNEW(self,binning_function=None,path='',number_of_bins=6):
-        """Draws map of total number of answers per country.
-
-        :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
-        :param number_of_bins: how many bins to divide data into-- default is 6
-        """
-
-        if not path:
-            path = self.current_directory+'/maps/'
-        data = analysis.success_probabilities(self.prior[0],self.prior[1])[self.bounds[0]:self.bounds[1]]
+        data = analysis.difficulty_probabilities(self.prior)[self.bounds[0]:self.bounds[1]]
         colours = None
 
         if not data.empty:
@@ -419,8 +399,8 @@ class Map(Drawable):
 
         if not path:
             path = self.current_directory+'/maps/'
-        data = analysis.estimate_current_skills(self.frame,self.prior[0],self.prior[1])
-        data = analysis.success_probabilities(data,self.prior[1])[self.bounds[0]:self.bounds[1]]
+        data = analysis.estimate_current_knowledge(self.frame,self.prior)
+        data = analysis.success_probabilities(data,self.prior)
         colours = None
 
         if not data.empty:

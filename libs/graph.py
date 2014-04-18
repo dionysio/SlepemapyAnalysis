@@ -96,7 +96,7 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(arange(len(data)),data.values, color="cyan")
-            ax.xaxis.set_major_locator(self.locator(data))
+            #ax.xaxis.set_major_locator(self.locator(data))
             ax.set_title(u"Lengths of sessions over time")
             ax.set_ylabel(u"Session length [seconds]")
             ax.set_xlabel(u"Session number")
@@ -123,7 +123,7 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(arange(len(data)),data.values, color="cyan")
-            ax.xaxis.set_major_locator(self.locator(data))
+            #ax.xaxis.set_major_locator(self.locator(data))
             ax.set_title(u"Number of questions over sessions")
             ax.set_ylabel(u"Mean number of questions")
             ax.set_xlabel(u"Session number")
@@ -149,7 +149,7 @@ class Graph(Drawable):
             ax.bar(arange(len(data)), data.values, color="cyan")
             diff = (data.values.max() - data.values.min())/10.0
             plt.ylim((data.values.min()-diff,data.values.max()+diff))
-            ax.xaxis.set_major_locator(self.locator(data))
+            #ax.xaxis.set_major_locator(self.locator(data))
             ax.set_title(u"Progress of success rate over sessions")
             ax.set_xlabel('Session number')
             ax.set_ylabel('Mean success rate')
@@ -167,7 +167,7 @@ class Graph(Drawable):
 
         if not path:
             path = self.current_directory+'/graphs/'
-        data = analysis.prior_skill_session(self.frame,self.prior[1],self.codes)
+        data = analysis.prior_skill_session(self.frame,self.prior,self.codes)
 
         if not data.empty:
             fig, ax = plt.subplots()
