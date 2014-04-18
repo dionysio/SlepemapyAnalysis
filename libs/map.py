@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from drawable import *
+from drawable import Drawable
 import analysis
 
-import pandas as pd
-import numpy as np
+from pandas import DataFrame, cut
+from numpy import log2
 
 from sys import maxint
 import colorbrewer
@@ -30,12 +30,12 @@ def nested_means_classification(data,classes=8):
     """Data is divided by nested-means.
 
     :param data: values to bin
-    :param classes: divide values into this many bins, should be a power of 2
+    :param classes: divide values into this many bins, has to be a power of 2
     """
 
     if len(data)<classes:
         return [data.min()-1,data.max()+1]
-    breaks = [data.min()-1,data.max()+1]+_nested_means_classification(data,np.log2(classes))
+    breaks = [data.min()-1,data.max()+1]+_nested_means_classification(data,log2(classes))
     breaks = list(set(breaks)) #drop duplicate bins
     breaks.sort()
     return breaks
@@ -57,7 +57,7 @@ def equidistant_classification(data,classes=8):
 
 def jenks_classification(data, classes=8):
     """Port of original javascript implementation by Tom MacWright from https://gist.github.com/tmcw/4977508
-    
+
     Data is divided by jenks algorithm.
 
     :param data: values to bin
@@ -68,8 +68,8 @@ def jenks_classification(data, classes=8):
     input.sort()
     input = input.tolist()
     length = len(data)
-    
-    #define initial values of the LC and OP 
+
+    #define initial values of the LC and OP
     lower_class_limits = [[1 for x in range(0,classes+1)] if y==0 else [0 for x in range(0,classes+1)] for y in range(0,length+1)] #LC
     variance_combinations = [[0 for x in range(0,classes+1)] if y==0 else [maxint for x in range(0,classes+1)] for y in range(0,length+1)] #OP
     variance = 0
@@ -89,7 +89,7 @@ def jenks_classification(data, classes=8):
             sum_squares += value * value
             variance = sum_squares - (sum * sum) / counter
             i4 = i3 - 1 #IV
-            
+
             if (i4 != 0) :
                 for k in range(0,classes+1):
                     #deciding whether an addition of this element will increase the class variance beyond the limit
@@ -99,7 +99,7 @@ def jenks_classification(data, classes=8):
                         variance_combinations[i][k] = variance + variance_combinations[i4][k - 1]
         lower_class_limits[i][1] = 1
         variance_combinations[i][1] = variance #we can use variance_combinations in calculations of goodness-of-fit, but we do not need it right now
-    
+
     #create breaks
     length -= 1
     breaks = []
@@ -109,30 +109,33 @@ def jenks_classification(data, classes=8):
         breaks.append(input[lower_class_limits[length][classes] - 2])
         length = lower_class_limits[length][classes] -1
         classes-=1
-    
+
     breaks = list(set(breaks)) #drop duplicate bins
     breaks.sort()
     return breaks
 
 
 class Map(Drawable):
-    
-    def __init__(   self, path='',codes=None, difficulties = None, df=None, user=None, place_asked=None,
-                    lower_bound = 50, upper_bound = 236, session_numbers=True):
+
+    def __init__(   self, path='', df=None, user=None, place_asked=None,
+                    bounds = (50, 236), prior = None, codes=None):
         """Draws world map by default. All other defaults are same as in Drawable.
+        
+        :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
         """
 
-        Drawable.__init__(self,path,codes,difficulties,df,user,place_asked,lower_bound,upper_bound,session_numbers)
+        Drawable.__init__(self,path,df,user,place_asked,bounds,prior)
 
         config ={
             "layers": {
-                "states": {    
-                    "src": self.current_dir+"/ne_110m_admin_1_countries/ne_110m_admin_0_countries.shp",
+                "states": {
+                    "src": self.current_directory+"/data/ne_110m_admin_1_countries/ne_110m_admin_0_countries.shp",
                     "filter": ["continent", "in", ["Europe","Asia","Africa","South America","Oceania","North America"]],
                     "class": "states"
                 }
             }
         }
+
         self.set_config(config)
         self._k = Kartograph()
 
@@ -140,12 +143,11 @@ class Map(Drawable):
     def set_config(self,config):
         self.config = config
 
-    
     @staticmethod
     def bin_data(data,binning_function=None,number_of_bins=6,
             additional_countries=None,additional_labels=[],colour_range="YlOrRd"):
         """Combines classification methods with colouring, returns binned data with assigned colours
-    
+
         :param data: values to bin
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param number_of_bins: how many bins to divide data-- default is 6
@@ -155,41 +157,41 @@ class Map(Drawable):
         :param colours: use these colours instead of predefined ones
 
         """
-    
+
         if binning_function is None:
             binning_function = jenks_classification
-        binned = pd.DataFrame(data)
+        binned = DataFrame(data)
         binned = binned.reset_index()
         binned.columns=['country','counts']
-    
+
         bins = binning_function(binned['counts'],number_of_bins)
-        binned['bin'] = pd.cut(binned['counts'], bins=bins,labels=False)
-        
+        binned['bin'] = cut(binned['counts'], bins=bins,labels=False)
+
         if colour_range == 'RdYlGn':
             colours = colorbrewer.RdYlGn[len(bins)-1] #Red, Yellow, Green
         else:
             colours = colorbrewer.YlOrRd[len(bins)-1] #Yellow, Orange, Red
-            
+
         binned['rgb'] = binned.bin.apply(lambda x: colours[x])
         binned = binned.append(additional_countries)
-    
+
         colours = list(reversed(colours))
-        colours = pd.DataFrame(zip(colours))
+        colours = DataFrame(zip(colours))
         if additional_countries is not None:
-            colours = colours.append([[additional_countries.rgb.values[0]]],ignore_index=True)         
+            colours = colours.append([[additional_countries.rgb.values[0]]],ignore_index=True)
         colours = colours.append([[(255,255,255)]],ignore_index=True) #white for No data bin
         colours.columns = ['rgb']
         colours['label'] = Map.bins_to_string(bins)+additional_labels+['No data']
         return (binned,colours)
 
-    
+
     @staticmethod
     def bins_to_string(bins):
         """ Returns list of strings from the bins in the interval form: (lower,upper]
-    
+
         :param bins: bins to get strings from
         """
-    
+
         bins[0]+=1 #corrections for bins
         bins[-1]-=1
         bins = [round(x,2) for x in bins]
@@ -200,34 +202,34 @@ class Map(Drawable):
 
     def generate_css(self,data,path,optional_css=''):
         """Generates css for coloring in countries.
-    
+
         :param data: df with columns [country,rgb], where country is an ID and rgb are colour values
         :param path: output directory
         :param optional_css: append additional css at the end of the calculated css-- default is ''
         """
 
         with open(path,'w+') as css:
-            if not data.empty: 
-                data.apply(lambda x: 
+            if not data.empty:
+                data.apply(lambda x:
                 css.write('.states[iso_a2='+self.codes[self.codes.id==int(x.country)]['code'].values[0].upper()+']'+
                 '{\n\tfill: '+self.colour_value_rgb_string(x.rgb[0],x.rgb[1],x.rgb[2])+';\n}\n'),axis=1)
             if optional_css:
                 optional = open(optional_css,'r')
                 css.write(optional.read())
-   
-   
+
+
     @staticmethod
     def colour_value_rgb_string(r,g,b):
         """Returns string in format 'rgb(r,g,b)'.
         """
-    
-        return '\'rgb('+str(r)+', '+str(g)+', '+str(b)+')\''    
 
-    
+        return '\'rgb('+str(r)+', '+str(g)+', '+str(b)+')\''
+
+
     @staticmethod
-    def draw_bins(data,path,x=5,y=175,bin_width=15,font_size=12):
+    def draw_bins(data,path,xy=(5,175),bin_width=15,font_size=12):
         """Draws bins into svg.
-    
+
         :param data: data with columns [label,r,g,b] where label is text next to the bin and rgb are colour values
         :param path: path to svg
         :param x: starting x position of the legend
@@ -238,7 +240,7 @@ class Map(Drawable):
 
         with copen(path,'r+','utf-8') as svg:
             svg.seek(-6,2) #skip to the position right before </svg> tag
-            svg.write('\n<g transform = \"translate('+str(x)+' '+str(y)+')\">\n') #group
+            svg.write('\n<g transform = \"translate('+str(xy[0])+' '+str(xy[1])+')\">\n') #group
             for i in range(len(data)):
                 svg.write(  '<rect x=\"0\" y=\"'+str((i+1)*bin_width)+
                             '\" width=\"'+str(bin_width)+'\" height=\"'+str(bin_width)+
@@ -247,12 +249,12 @@ class Map(Drawable):
                             '\" stroke=\"none\" fill=\"black\" font-size=\"'+str(font_size)+
                             '" font-family=\"sans-serif\">'+data.label.values[i]+'</text>\n')
             svg.write('</g>\n</svg>') #group
-    
-    
+
+
     @staticmethod
-    def draw_title(path,title='',x=400,y=410,font_size=20,colour='black'):
+    def draw_title(path,title='',xy=(400,410),font_size=20,colour='black'):
         """Draws title into svg.
-    
+
         :param path: path to svg
         :param title: text do input into picture
         :param x: starting x position of the title
@@ -263,146 +265,166 @@ class Map(Drawable):
 
         with copen(path,'r+','utf-8') as svg:
             svg.seek(-6,2)
-            svg.write(  '\n<text x =\"'+str(x)+'\" y=\"'+str(y)+'\" stroke=\"none\" font-size=\"'+
+            svg.write(  '\n<text x =\"'+str(xy[0])+'\" y=\"'+str(xy[1])+'\" stroke=\"none\" font-size=\"'+
                         str(font_size)+'\" fill=\"'+colour+'\" font-family=\"sans-serif\">'+
                         title+'</text>\n</svg>')
-    
-    
+
+
     def draw_map(self,path,title='',colours=None):
-        """General drawing method through kartograph. Looks for css in current_dir+'/style.css' for styling css.
-    
+        """General drawing method through kartograph. Looks for css in current_directory+'/style.css' for styling css.
+
         :param path: output directory
         :param title: name of map
         :param colours: dataframe with colours for bins -- default is None
         """
 
-        with open(self.current_dir+'/style.css') as css:
+        with open(self.current_directory+'/data/style.css') as css:
             self._k.generate(self.config,outfile=path,stylesheet=css.read())
         if colours is not None:
-            self.draw_bins(colours,path) 
+            self.draw_bins(colours,path)
         if title:
             self.draw_title(path,title)
 
     ############################################################################
-    
-    
+
+
     def mistaken_countries(self,binning_function=None,path='',number_of_bins=6):
         """ Draws map of most mistaken countries for this specific one
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
+            path = self.current_directory+'/maps/'
 
         data = analysis.mistaken_countries(self.frame)
         colours = None
         if not (data.empty or self.place_asked is None):
-            place = pd.DataFrame([[self.place_asked,(0,255,255)]],columns=['country','rgb'])
+            place = DataFrame([[self.place_asked,(0,255,255)]],columns=['country','rgb'])
             (data,colours) = self.bin_data(data,binning_function,number_of_bins,additional_countries=place,additional_labels=[self.get_country_name(self.place_asked)])
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'mistaken_countries.svg','Mistaken countries',colours)
+        self.draw_map(path+'mistaken_countries.svg','Countries mistaken for '+str(self.place_asked),colours)
 
 
     def number_of_answers(self,binning_function=None,path='',number_of_bins=6):
         """Draws map of total number of answers per country.
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
+            path = self.current_directory+'/maps/'
 
         data = analysis.number_of_answers(self.frame)
         colours = None
         if not data.empty:
             (data,colours) = self.bin_data(data,binning_function,number_of_bins)
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
         self.draw_map(path+'number_of_answers.svg','Number of answers',colours)
-    
-    
+
+
     def response_time(self,binning_function=None,path='',number_of_bins=6):
         """Draws map of mean response time per country.
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
+            path = self.current_directory+'/maps/'
 
         data = analysis.response_time(self.frame)
         colours = None
         if not data.empty:
             (data,colours) = self.bin_data(data,binning_function,number_of_bins)
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
         self.draw_map(path+'response_time.svg','Response time',colours)
 
 
     def difficulty(self,binning_function=None,path='',number_of_bins=6):
         """Draws map of total number of answers per country.
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
-        data = analysis.difficulty_probabilities(self.difficulties)
+            path = self.current_directory+'/maps/'
+        data = analysis.difficulty_probabilities(self.prior[1])[self.bounds[0]:self.bounds[1]]
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,binning_function,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+
+        self.draw_map(path+'difficulty.svg','Difficulty for an average user',colours)
+
+
+    def difficultyNEW(self,binning_function=None,path='',number_of_bins=6):
+        """Draws map of total number of answers per country.
+
+        :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
+        :param path: output directory -- default is '' (current dir)
+        :param number_of_bins: how many bins to divide data into-- default is 6
+        """
+
+        if not path:
+            path = self.current_directory+'/maps/'
+        data = analysis.success_probabilities(self.prior[0],self.prior[1])[self.bounds[0]:self.bounds[1]]
+        colours = None
+
+        if not data.empty:
+            (data,colours) = self.bin_data(data,binning_function,number_of_bins,colour_range="RdYlGn")
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
         self.draw_map(path+'difficulty.svg','Difficulty for an average user',colours)
 
 
     def success(self,binning_function=None,path='',number_of_bins=6):
         """Draws map of mean success rate per country.
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
+            path = self.current_directory+'/maps/'
         data = analysis.mean_success(self.frame)
         colours = None
-        
+
         if not data.empty:
             (data,colours) = self.bin_data(data,binning_function,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
         self.draw_map(path+'success.svg','Mean success rate',colours)
-    
-    
-    def skill(self,binning_function=None,path='',number_of_bins=6):
+
+
+    def skill(self,binning_function=None,path='',number_of_bins=6,threshold=None):
         """Draws map of skill per country.
-    
+
         :param binning_function: which function to use for binning -- default is None (-> jenks_classification)
         :param path: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
         if not path:
-            path = self.current_dir+'/maps/'
-        data = analysis.mean_skill_session(self.frame,self.difficulties,threshold=None)[1]
-        data = analysis.success_probabilities(data,self.difficulties)
+            path = self.current_directory+'/maps/'
+        data = analysis.estimate_current_skills(self.frame,self.prior[0],self.prior[1])
+        data = analysis.success_probabilities(data,self.prior[1])[self.bounds[0]:self.bounds[1]]
         colours = None
-        
+
         if not data.empty:
             (data,colours) = self.bin_data(data,binning_function,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_dir+'/style.css')
+            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
 
         self.draw_map(path+'skill.svg','Skill ',colours)
