@@ -184,7 +184,7 @@ def response_time(frame, right=None):
     :type right: True/False/None -- default is None
     """
 
-    answers = frame
+    answers = frame[frame.response_time<60000]
     if right:
         answers = answers[answers.place_asked==answers.place_answered]
     elif right == False:
@@ -257,7 +257,8 @@ def mean_response_session(frame,threshold=None):
     :param threshold: consider only this many sessions
     """
 
-    first = first_questions(frame.groupby('session_number'))
+    first = frame[frame.response_time<60000]
+    first = first_questions(first.groupby('session_number'))
     times = [] #collects already calculated times
     if threshold is None:
         limit = first.session_number.max()+1
@@ -271,12 +272,7 @@ def mean_response_session(frame,threshold=None):
     return Series(times)
 
 
-def mean_success_session(frame, threshold=None):
-    """Returns progress of mean_success_rate and mean_response_time over sessions.
-
-    :param threshold: consider only this many sessions
-    """
-
+def _mean_success_session(frame, threshold=None):
     first = first_questions(frame.groupby('session_number'))
     rates = [] #collects already calculated rates
     if threshold is None:
@@ -289,6 +285,18 @@ def mean_success_session(frame, threshold=None):
         rates += [len(temp[temp.place_asked==temp.place_answered])/float(len(temp.place_asked))]
 
     return Series(rates)
+
+def mean_success_session(frame, codes, threshold=None):
+    """Returns progress of mean_success_rate over sessions.
+
+    :param threshold: consider only this many sessions
+    """
+
+    result = frame
+    result.place_map = result.place_map.fillna(225)
+    result['place_type'] = result.apply(lambda x: codes[codes.id==x.place_asked]['type'].values[0],axis=1)
+    result = result.groupby(['session_number','place_map','place_type'])
+    return result.apply(lambda x: _mean_success_session(x,threshold))
 
 
 def prior_skill_session(frame, difficulties, codes):

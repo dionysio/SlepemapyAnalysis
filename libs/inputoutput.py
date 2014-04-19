@@ -25,7 +25,7 @@ def load_geo_csv(path):
 
     """
 
-    types = {'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map':float16}
+    types = {'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map':float16,'ip_address':object}
     df = read_csv(path, parse_dates=[5],dtype=types,index_col='id')
     return df
 

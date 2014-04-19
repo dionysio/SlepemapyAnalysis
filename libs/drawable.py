@@ -10,23 +10,20 @@ class Drawable():
     :param df: dataframe to save -- default None
     :param user: filter by user id -- default None
     :param place_asked: filter by place_asked -- default None
-    :param bounds: -- filter by places in range (lower,upper) -- default is (50,236) - only countries
     """
 
-    def __init__(   self,path='', df=None, user=None, place_asked=None,
-                    bounds = (50, 236), prior=None, codes=None):
+    def __init__(   self,path='', df=None, user=None, place_asked=None, prior=None, codes=None):
 
         self.current_directory = path
         self.prior = prior
         self.frame = None
-        self.bounds = bounds
         self.place_asked = place_asked
         self.codes = codes
 
         if df is not None:
             #filtering frame
-            self.frame = df[(df.place_asked>self.bounds[0]) & (df.place_asked<self.bounds[1])]
-            self.frame = self.frame[self.frame.response_time<60000]
+            self.frame = df
+            #self.frame = self.frame[self.frame.response_time<60000]
 
             if user is not None:
                 self.frame = self.frame[self.frame.user==user]

@@ -14,12 +14,11 @@ import colorsys
 
 class Graph(Drawable):
 
-    def __init__(   self, path='', df=None, user=None, place_asked=None,
-                    bounds = (50,236), prior=None, codes= None):
+    def __init__(   self, path='', df=None, user=None, place_asked=None, prior=None, codes= None):
         """Sets matplotlib to be non-interactive. All other defaults are same as in Drawable.
         """
 
-        Drawable.__init__(self, path, df, user, place_asked, bounds, prior, codes)
+        Drawable.__init__(self, path, df, user, place_asked, prior, codes)
         interactive(False) #disable matplotlib interactivity
 
 
@@ -141,24 +140,33 @@ class Graph(Drawable):
 
         if not path:
             path = self.current_directory+'/graphs/'
-        data = analysis.mean_success_session(self.frame,threshold)
+        data = analysis.mean_success_session(self.frame,self.codes,threshold)
 
         if not data.empty:
             fig, ax = plt.subplots()
 
-            ax.bar(arange(len(data)), data.values, color="cyan")
-
+            data = data.reset_index()
             diff = (data.values.max() - data.values.min())/10.0
             max_limit = 1 if data.values.max()+diff>1 else data.values.max()+diff
             min_limit = 0 if data.values.min()-diff<0 else data.values.min()-diff
             plt.ylim((min_limit,max_limit))
+            plt.xlim((data.session_number.min()-0.1,data.session_number.max()+0.1))
+
+            data = data.groupby(['place_map','place_type'])
+            _colours = self.colour_range(len(data)+1)
+            data.apply(lambda x: self._plot_group(x,ax,_colours.pop()))
 
             ax.set_title(u"Progress of success rate over sessions")
             ax.set_xlabel('Session number')
             ax.set_ylabel('Mean success rate')
+            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
             plt.savefig(path+'success.svg', bbox_inches='tight')
             plt.close()
+
+
+    def _plot_group(self, data, ax, colour):
+        ax.plot(data['session_number'],data[0],color=colour,marker='o',label=(str(self.get_country_code(data.name[0])),data.name[1]))
 
 
     def skill(self, path='', threshold=None):
@@ -182,8 +190,7 @@ class Graph(Drawable):
 
             data = data.groupby(['place_map','place_type'])
             _colours = self.colour_range(len(data)+1)
-            _plot_group = lambda x, y, z: y.plot(x['session_number'],x[0],color=z,marker='o',label=(str(self.get_country_code(x.name[0])),x.name[1]))         
-            data.apply(lambda x: _plot_group(x,ax,_colours.pop()))
+            data.apply(lambda x: self._plot_group(x,ax,_colours.pop()))
 
             ax.set_title(u"Progress of skill over sessions for individual regions")
             ax.set_xlabel('Session number')

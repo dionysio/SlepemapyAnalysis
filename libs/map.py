@@ -117,14 +117,13 @@ def jenks_classification(data, classes=8):
 
 class Map(Drawable):
 
-    def __init__(   self, path='', df=None, user=None, place_asked=None,
-                    bounds = (50, 236), prior = None, codes=None):
+    def __init__(   self, path='', df=None, user=None, place_asked=None, prior = None, codes=None):
         """Draws world map by default. All other defaults are same as in Drawable.
         
         :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
         """
 
-        Drawable.__init__(self,path,df,user,place_asked,bounds,prior,codes)
+        Drawable.__init__(self,path,df,user,place_asked,prior,codes)
 
         config ={
             "layers": {
@@ -359,7 +358,7 @@ class Map(Drawable):
 
         if not path:
             path = self.current_directory+'/maps/'
-        data = analysis.difficulty_probabilities(self.prior)[self.bounds[0]:self.bounds[1]]
+        data = analysis.difficulty_probabilities(self.prior)[55:236] #filter only for world countries
         colours = None
 
         if not data.empty:
