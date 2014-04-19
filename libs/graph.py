@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib import interactive
 from matplotlib.dates import date2num
 from matplotlib.ticker import FuncFormatter, MultipleLocator
+from pandas import DateOffset
 import colorbrewer
 import colorsys
 
@@ -96,7 +97,7 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(arange(len(data)),data.values, color="cyan")
-            #ax.xaxis.set_major_locator(self.locator(data))
+            
             ax.set_title(u"Lengths of sessions over time")
             ax.set_ylabel(u"Session length [seconds]")
             ax.set_xlabel(u"Session number")
@@ -112,7 +113,7 @@ class Graph(Drawable):
     def number_of_answers(self, path='',threshold=None):
         """Draws graph of number of answers per session.
 
-        :param threshold: how many sessions to plot (globally there are 50+ sessions, but most of the people stay for 10+-)
+        :param threshold: how many sessions to plot
         :param path: -- default is '' (current_directory)
         """
 
@@ -123,7 +124,6 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(arange(len(data)),data.values, color="cyan")
-            #ax.xaxis.set_major_locator(self.locator(data))
             ax.set_title(u"Number of questions over sessions")
             ax.set_ylabel(u"Mean number of questions")
             ax.set_xlabel(u"Session number")
@@ -147,9 +147,12 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(arange(len(data)), data.values, color="cyan")
+
             diff = (data.values.max() - data.values.min())/10.0
-            plt.ylim((data.values.min()-diff,data.values.max()+diff))
-            #ax.xaxis.set_major_locator(self.locator(data))
+            max_limit = 1 if data.values.max()+diff>1 else data.values.max()+diff
+            min_limit = 0 if data.values.min()-diff<0 else data.values.min()-diff
+            plt.ylim((min_limit,max_limit))
+
             ax.set_title(u"Progress of success rate over sessions")
             ax.set_xlabel('Session number')
             ax.set_ylabel('Mean success rate')
@@ -192,7 +195,7 @@ class Graph(Drawable):
 
 
     def answers_percentages(self, path='', threshold=0.01):
-        """Draws graph of mean skill and mean response time per session.
+        """Draws graph 
 
         :param threshold: how many sessions to draw -- default is 10
         :param path: output directory -- default is '' (current_directory)
@@ -216,7 +219,93 @@ class Graph(Drawable):
                     labels += [self.get_country_name(id)]
 
             ax.pie(data.values,colors=colours ,labels=labels, autopct='%1.1f%%')
-            ax.set_title(u"Percentages of numbers of answers for "+labels[-2])
+            ax.set_title(u"Percentages of answers for "+labels[-2])
 
             plt.savefig(path+'answers_percentages.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def number_of_users(self, path ='', frequency = 'M'):
+        """Draws graph
+
+        :param frequency: defines sampling value - all available frequencies are available at pandas documentation (http://pandas.pydata.org/pandas-docs/stable/timeseries.html#dateoffset-objects) -- default is 'M' == month
+        :param path: output directory -- default is '' (current_directory)
+        """
+        
+        if not path:
+            path = self.current_directory+'/graphs/'
+        data = analysis.number_of_users(self.frame,frequency)
+
+        if not data.empty:
+            fig, ax = plt.subplots()
+            ax.bar(data.index,data.values, color="cyan", width=15)
+
+            diff = (data.max() - data.min())/10.0
+            min_limit = 0 if data.min()-diff<0 else data.min()-diff
+            plt.ylim((min_limit,data.max()+diff))
+            plt.xlim((data.index.min()-DateOffset(days=3),data.index.max()+DateOffset(days=3)))
+
+            ax.set_title(u"Number of users per "+frequency)
+            ax.set_ylabel(u"Number of users")
+            ax.set_xlabel(u"Date")
+            fig.autofmt_xdate()
+
+            plt.savefig(path+'number_of_users.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def mean_success_rate(self, path ='',frequency='M'):
+        """Draws graph
+
+        :param path: output directory -- default is '' (current_directory)
+        """
+        
+        if not path:
+            path = self.current_directory+'/graphs/'
+        data = analysis.mean_success_rate(self.frame,frequency)
+
+        if not data.empty:
+            fig, ax = plt.subplots()
+            ax.bar(data.index,data.values, color="cyan")
+
+            diff = (data.max() - data.min())/10.0
+            max_limit = 1 if data.max()+diff>1 else data.max()+diff
+            min_limit = 0 if data.max()-diff<0 else data.min()-diff
+            plt.ylim((min_limit,max_limit))
+            plt.xlim((data.index.min()-DateOffset(days=3),data.index.max()+DateOffset(days=3)))
+
+            fig.autofmt_xdate()
+            ax.set_title(u"Mean success rate of users per "+frequency)
+            ax.set_ylabel(u"Mean success rate")
+            ax.set_xlabel(u"Date")
+
+            plt.savefig(path+'mean_success_rate.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def mean_number_of_answers(self, path='', frequency='M'):
+        """Draws graph
+
+        :param path: output directory -- default is '' (current_directory)
+        """
+        
+        if not path:
+            path = self.current_directory+'/graphs/'
+        data = analysis.mean_number_of_answers(self.frame,frequency)
+
+        if not data.empty:
+            fig, ax = plt.subplots()
+            ax.bar(data.index,data.values, color="cyan")
+
+            diff = (data.max() - data.min())/10.0
+            min_limit = 0 if data.min()-diff<0 else data.min()-diff
+            plt.ylim((min_limit,data.max()+diff))
+            plt.xlim((data.index.min()-DateOffset(days=3),data.index.max()+DateOffset(days=3)))
+
+            fig.autofmt_xdate()
+            ax.set_title(u"Mean number of answers per "+frequency)
+            ax.set_ylabel(u"Mean number of answers")
+            ax.set_xlabel(u"Date")
+
+            plt.savefig(path+'mean_number_of_answers.svg', bbox_inches='tight')
             plt.close()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from pandas import DataFrame, Series, DatetimeIndex
+from pandas import DataFrame, Series, DatetimeIndex, DateOffset
 from numpy import int32, timedelta64, arange
 
 from math import exp
@@ -295,12 +295,12 @@ def prior_skill_session(frame, difficulties, codes):
     """
     """
 
-    first = frame
-    first.place_map = frame.place_map.fillna(225)
-    first['place_type'] = first.apply(lambda x: codes[codes.id==x.place_asked]['type'].values[0],axis=1)
-    first = first.groupby(['session_number','place_map','place_type'])
+    result = frame
+    result.place_map = result.place_map.fillna(225)
+    result['place_type'] = result.apply(lambda x: codes[codes.id==x.place_asked]['type'].values[0],axis=1)
+    result = result.groupby(['session_number','place_map','place_type'])
 
-    return first.apply(lambda x: estimate_prior_knowledge(x, difficulties)[0])
+    return result.apply(lambda x: estimate_prior_knowledge(x, difficulties)[0])
 
 
 def answers_percentages(frame, threshold=None):
@@ -313,12 +313,44 @@ def answers_percentages(frame, threshold=None):
         return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))   
 
 
-def success_rate_inserted(frame):
-    return frame.groupby('user').apply(lambda x: (len(x[x.place_asked==x.place_answered])/float(len(x)),x.inserted.values[0]))
+def _success_rate(frame, frequency='M'):
+    if frequency == 'M':
+        result = frame[frame.inserted[0]:frame.inserted[0]+DateOffset(months=1)]
+    elif frequency== 'W':
+        result = frame[frame.inserted[0]:frame.inserted[0]+DateOffset(days=7)]
+    else:
+        result = frame[frame.inserted[0]:frame.inserted[0]+DateOffset(days=1)]
+    return len(result[result.place_asked==result.place_answered])/float(len(result)) if len(result) else None
 
 
-def number_of_users(frame):
+def mean_success_rate(frame, frequency = 'M'):
+    result = frame.set_index(DatetimeIndex(frame.inserted))
+    if frequency=='M':
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.month])
+    elif frequency == 'W':
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.week])
+    else:
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.day])
+    result = result.apply(lambda x: Series({'success_rate':_success_rate(x,frequency), 'date':x.inserted.values[0]}))
+    result = result.set_index(DatetimeIndex(result['date']))
+    return result.resample(frequency, how='mean').success_rate
+
+
+def number_of_users(frame, frequency = 'M'):
     times = frame.groupby('user').apply(lambda x: x.inserted.values[0])
     times = times.reset_index()
-    times.index = DatetimeIndex(times[0])
-    return times.resample('M',how=len)['user']
+    times = times.set_index(DatetimeIndex(times[0]))
+    return times.resample(frequency,how=len).user
+
+
+def mean_number_of_answers(frame, frequency= 'M'):
+    result = frame.set_index(DatetimeIndex(frame.inserted))
+    if frequency=='M':
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.month])
+    elif frequency == 'W':
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.week])
+    else:
+        result = result.groupby(['user',lambda x: x.year,lambda x: x.day])
+    result = result.apply(lambda x: Series({'length': len(x) if len(x) else None, 'date':x.inserted.values[0]}))
+    result = result.set_index(DatetimeIndex(result.date))
+    return result.resample(frequency,how='mean').length

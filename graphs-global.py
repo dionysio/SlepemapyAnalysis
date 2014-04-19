@@ -16,7 +16,9 @@ if not path.exists(directory):
 
 print 'Generating global graphs'
 g.success(path=directory,threshold=15)
-g.skill(path=directory,threshold=15)
+g.number_of_users(path=directory)
+g.mean_number_of_answers(path=directory)
+g.mean_success_rate(path=directory)
 g.lengths_of_sessions(path=directory,threshold=15)
 g.number_of_answers(path=directory,threshold=15)
 g.weekday_activity(path=directory)
