@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from elo_rating_system import calculate_difficulties
+from common import add_session_numbers, defaultdict_factory
+
 from numpy import uint32,uint16,uint8,float16
 from pandas import read_csv
 from yaml import dump,load
-
-from analysis import calculate_difficulties,add_session_numbers
-
 from argparse import ArgumentParser
 from os import path
 
@@ -22,7 +22,7 @@ def load_geo_csv(path):
     - 'response_time':uint32
     - 'number_of_options':uint8
     - 'place_map':float16 -- has to be float, because uint does not understand NaN (which place_map may contain)
-
+    - 'ip_address':object
     """
 
     types = {'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map':float16,'ip_address':object}
@@ -59,7 +59,7 @@ def load_prior(path):
     with open(path) as diff:
         return load(diff)
 
-def arguments(directory, require_items=True):
+def get_arguments(directory, require_items=True):
     parser = ArgumentParser()
     parser.add_argument('-f', '--file', metavar = 'FILE', help='Optional path to directory with geography-answer.csv and prior.yaml')
     if require_items:

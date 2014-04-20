@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from libs.map import Map
-from libs.inputoutput import arguments
+from libs.input_output import get_arguments
 
 from os import path,makedirs
 
 
-(items, frame, prior, codes, working_directory) = arguments(path.dirname(path.realpath(__file__)), False)
+(items, frame, prior, codes, working_directory) = get_arguments(path.dirname(path.realpath(__file__)), False)
 
 m = Map(working_directory, frame, prior=prior, codes=codes)
 
@@ -15,7 +15,7 @@ if not path.exists(directory):
     makedirs(directory)
 
 print 'Generating global maps'
-m.difficulty(path=directory)
+m.average_knowledge(path=directory)
 m.success(path=directory)
 m.number_of_answers(path=directory)
 m.response_time(path=directory)

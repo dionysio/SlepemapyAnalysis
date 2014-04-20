@@ -1,5 +1,5 @@
 !!python/object/apply:collections.defaultdict
-args: [!!python/name:libs.analysis.defaultdict_factory '']
+args: [!!python/name:libs.common.defaultdict_factory '']
 dictitems:
   1: !!python/tuple [0.9753875138856005, 244]
   2: !!python/tuple [0.5200623681182854, 403]
