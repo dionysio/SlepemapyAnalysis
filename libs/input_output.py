@@ -9,7 +9,8 @@ from yaml import dump,load
 from argparse import ArgumentParser
 from os import path
 
-def load_geo_csv(path):
+
+def load_answer_csv(path):
     """Imports csv into pandas DataFrame
 
     default dtypes:
@@ -30,14 +31,15 @@ def load_geo_csv(path):
     return df
 
 
-def load_general_csv(path,enc = 'utf-8'):
+def load_place_csv(path):
     """Used for importing general csv
 
     :param names: new names for columns
     :param enc: encoding of csv file
     """
 
-    return read_csv(path,encoding=enc)
+    types = {'id':uint32,'code':object,'name':object,'type':uint8}
+    return read_csv(path,encoding='utf-8', dtype = types)
 
 
 def save_prior(out, path):
@@ -71,13 +73,13 @@ def get_arguments(directory, require_items=True):
     else:
         working_directory = args.file
     
-    frame = load_geo_csv(working_directory+"/data/geography.answer.csv")
-    codes = load_general_csv(path=working_directory+'/data/geography.place.csv')
+    frame = load_answer_csv(working_directory+"/data/geography.answer.csv")
+    codes = load_place_csv(path=working_directory+'/data/geography.place.csv')
 
     if path.exists(working_directory+'/data/prior.yaml'):
         prior = load_prior(path=working_directory+'/data/prior.yaml')
     else:
-        frame = add_session_numbers(frame)
+        frame = frame.groupby('user').apply(add_session_numbers)
         prior = calculate_difficulties(frame)[0]
         save_prior(prior,working_directory+'/data/prior.yaml')
     

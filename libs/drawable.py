@@ -27,7 +27,7 @@ class Drawable():
                 self.frame = self.frame[self.frame.place_asked==place_asked]
 
             #adding new values to frame
-            self.frame = self.frame.groupby('user').apply(lambda x: add_session_numbers(x))
+            self.frame = self.frame.groupby('user').apply(add_session_numbers)
             self.frame.sort()
 
 

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from numpy import int32, timedelta64, log
+from numpy import timedelta64
 from common import first_questions, get_session_length
-from pandas import Series
+from pandas import Series, concat
 from elo_rating_system import estimate_prior_knowledge
+
 
 def lengths_of_sessions(frame,threshold=None):
     """Returns length of each session.
@@ -28,20 +29,19 @@ def lengths_of_sessions(frame,threshold=None):
 
 def number_of_answers(frame,threshold=None):
     """Returns number of answers for each session.
-    """
-
-    """Returns length of each session.
 
     :param threshold: maximum number of sessions to return
     """
+
     groups = frame.groupby(['user','session_number'])
-    groups = groups.apply(lambda x: len(x))
+    groups = groups.apply(len)
     groups = groups.reset_index().groupby('session_number')
     if threshold is None:
-        groups = (groups.sum()/groups.count().session_number.max())[0]
+        groups = concat([groups.session_number.apply(len),groups.sum()[0]/groups.session_number.apply(len)],axis=1)
     else:
-        groups = (groups.sum()/groups.count().session_number.max()).head(n=threshold)[0]
-    return groups.astype(int32)
+        groups = concat([groups.session_number.apply(len),groups.sum()[0]/groups.session_number.apply(len).head(n=threshold)],axis=1)
+    groups.columns = ['count','result']
+    return groups
 
 
 def _prepare_places(frame, codes):
@@ -71,43 +71,17 @@ def success(frame, codes, threshold=None):
     :param threshold: consider only this many sessions
     """
 
-    result = _prepare_places(frame, codes)
-    return result.apply(lambda x: _success(x,threshold))
+    data = _prepare_places(frame, codes)
+    data = concat([data.apply(len),data.apply(lambda x: _success(x,threshold)[0])], axis=1)
+    data.columns = ['count','result']
+    return data
 
 
 def skill(frame, difficulties, codes):
     """
     """
 
-    result = _prepare_places(frame, codes)
-    return result.apply(lambda x: estimate_prior_knowledge(x, difficulties)[0])
-
-
-def _response_time(frame,threshold=None):
-    """Returns progress of mean_success_rate and mean_response_time over sessions.
-
-    :param threshold: consider only this many sessions
-    """
-
-    first = frame[frame.response_time<60000]
-    first = first_questions(first.groupby('session_number'))
-    times = [] #collects already calculated times
-    if threshold is None:
-        limit = first.session_number.max()+1
-    else:
-        limit = threshold
-
-    for i in range(first.session_number.min(),limit):
-        temp = first[first.session_number<=i] #calculate with i# of sessions
-        times += [temp.response_time.mean()]
-    return Series(times)
-
-
-def response_time(frame, codes, threshold=None):
-    """Returns progress of mean_success_rate over sessions.
-
-    :param threshold: consider only this many sessions
-    """
-
-    result = _prepare_places(frame, codes)
-    return result.apply(lambda x: _response_time(x,threshold))
+    data = _prepare_places(frame, codes)
+    data = concat([data.apply(len), data.apply(lambda x: estimate_prior_knowledge(x, difficulties)[0])], axis=1)
+    data.columns = ['count','result']
+    return data
