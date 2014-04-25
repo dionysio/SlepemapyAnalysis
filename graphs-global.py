@@ -1,30 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from graph import *
-import inputoutput
+from libs.graph import Graph 
+from libs.input_output import get_arguments
 
-from argparse import ArgumentParser
 from os import path,makedirs
 
 
-parser = ArgumentParser(description='Generate global graphs.')
-parser.add_argument('-f', '--file', metavar = 'FILE', help='Optional path to directory with geography-answer.csv and difficulties.yaml')
+(items, frame, prior, codes, working_directory) = get_arguments(path.dirname(path.realpath(__file__)), False)
 
-args = parser.parse_args()
+g = Graph(working_directory, frame, prior = prior, codes=codes)
 
-if args.file is None:
-    working_directory = path.dirname(path.realpath(__file__))
-else:
-    working_directory = args.file
-frame = inputoutput.load_geo_csv(working_directory+"/geography.answer.csv")
-diff = inputoutput.load_difficulties(path=working_directory+'/difficulties.yaml')
-
-g = Graph(path, difficulties = diff, df = frame)
-
-directory = working_directory+'/graphs/global/'+item+'/'
+directory = working_directory+'/graphs/global/'
 if not path.exists(directory):
     makedirs(directory)
-    
+
 print 'Generating global graphs'
-g.success(path=directory)
-g.skill(path=directory)
+g.success_over_time(path=directory)
+# g.lengths_of_sessions(path=directory,threshold=15) #slow as hell on global
+g.number_of_answers_over_session(path=directory,threshold=15)
+g.number_of_answers_over_time(path=directory)
+g.number_of_users(path=directory)
+g.weekday_activity(path=directory)
+g.hourly_activity(path=directory)
