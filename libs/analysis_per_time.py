@@ -43,8 +43,9 @@ def success(frame, frequency = 'M'):
         result = result.groupby(['user',lambda x: x.year,lambda x: x.day])
     result = result.apply(lambda x: Series({'success_rate':_success(x,frequency), 'date':x.inserted.values[0]}))
     result = result.set_index(DatetimeIndex(result['date']))
-    return result.resample(frequency, how='mean').success_rate
-
+    result = result.resample(frequency, how='mean').success_rate
+    result.index = result.index - DateOffset(days=1)
+    return result
 
 def number_of_users(frame, frequency = 'M'):
     times = frame.groupby('user').apply(lambda x: x.inserted.values[0])

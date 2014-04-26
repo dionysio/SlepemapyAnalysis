@@ -40,40 +40,41 @@ def number_of_answers(frame,threshold=None):
         groups = concat([groups.session_number.apply(len),groups.sum()[0]/groups.session_number.apply(len)],axis=1)
     else:
         groups = concat([groups.session_number.apply(len),groups.sum()[0]/groups.session_number.apply(len).head(n=threshold)],axis=1)
-    groups.columns = ['count','result']
+    groups.columns = ['counts','result']
     return groups
 
 
 def _prepare_places(frame, codes):
+    '''Prepares frame for ['session_number','place_map','place_type'] groupings
+    '''
+
     result = frame
     result.place_map = result.place_map.fillna(225)
     result['place_type'] = result.apply(lambda x: codes[codes.id==x.place_asked]['type'].values[0],axis=1)
     return result.groupby(['session_number','place_map','place_type'])
 
 
-def _success(frame, threshold=None):
+def _success(frame):
+    '''Returns success for one 
+    '''
     first = first_questions(frame.groupby('session_number'))
-    rates = [] #collects already calculated rates
-    if threshold is None:
-        limit = first.session_number.max()+1
-    else:
-        limit = threshold
-
-    for i in range(first.session_number.min(),limit):
-        temp = first[first.session_number<=i] #calculate with i# of sessions
-        rates += [len(temp[temp.place_asked==temp.place_answered])/float(len(temp.place_asked))]
-    return Series(rates)
+    first = first.groupby('session_number')
+    first = first.apply(lambda x: len(x[x.place_asked==x.place_answered])/float(len(x.place_asked)))
+    return first
 
 
-def success(frame, codes, threshold=None):
-    """Returns progress of mean_success_rate over sessions.
+def success(frame, codes):
+    """Returns progress of mean_success_rate over sessions, expects only one user.
 
     :param threshold: consider only this many sessions
     """
 
     data = _prepare_places(frame, codes)
-    data = concat([data.apply(len),data.apply(lambda x: _success(x,threshold)[0])], axis=1)
-    data.columns = ['count','result']
+    r = data.apply(lambda x: _success(x))
+    r = r.reset_index(level=[0,1,2])
+    r = r.set_index(['session_number','place_map','place_type'])[0]
+    data = concat([data.apply(len),r], axis=1)
+    data.columns = ['counts','result']
     return data
 
 
@@ -83,5 +84,34 @@ def skill(frame, difficulties, codes):
 
     data = _prepare_places(frame, codes)
     data = concat([data.apply(len), data.apply(lambda x: estimate_prior_knowledge(x, difficulties)[0])], axis=1)
-    data.columns = ['count','result']
+    data.columns = ['counts','result']
     return data
+
+
+def average_success(frame, codes):
+    """Returns progress of mean_success_rate over sessions.
+
+    :param threshold: consider only this many sessions
+    """
+    data = frame.groupby('user')
+    data = data.apply(lambda x: success(x, codes))
+    data = data.reset_index()
+    data = data.groupby(['session_number','place_map','place_type'])
+    data = concat([data.apply(lambda x: x.counts.sum()), data.apply(lambda x: x.result.mean())],axis=1)
+    data.columns = ['counts','result']
+    return data
+
+
+def average_skill(frame, difficulties, codes):
+    """Returns progress of mean_success_rate over sessions.
+
+    :param threshold: consider only this many sessions
+    """
+    data = frame.groupby('user')
+    data = data.apply(lambda x: skill(x, difficulties, codes))
+    data = data.reset_index()
+    data = data.groupby(['session_number','place_map','place_type'])
+    data = concat([data.apply(lambda x: x.counts.sum()), data.apply(lambda x: x.result.mean())],axis=1)
+    data.columns = ['counts','result']
+    return data
+    

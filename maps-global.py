@@ -17,5 +17,6 @@ if not path.exists(directory):
 print 'Generating global maps'
 m.average_knowledge(path=directory)
 m.success(path=directory)
+m.skill(path=directory)
 m.number_of_answers(path=directory)
 m.response_time(path=directory)

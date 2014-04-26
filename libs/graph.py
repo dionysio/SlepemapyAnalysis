@@ -9,6 +9,7 @@ from common import colour_range
 from numpy import arange, ceil
 import matplotlib.pyplot as plt
 from matplotlib import interactive
+from matplotlib import rc
 import colorbrewer
 from os import path, makedirs
 
@@ -20,29 +21,37 @@ class Graph(Drawable):
 
         Drawable.__init__(self, path, df, user, place_asked, prior, codes)
         interactive(False) #disable matplotlib interactivity
+        rc('font', **{'sans-serif' : 'Times New Roman','family' : 'sans-serif'})
 
 
     def _plot_group(self,data, ax, colour, marker):
-        label = self.get_country_name(data.name[0])+', '+self.get_place_type_name_plural(data.name[1])
-        ax.plot(data['session_number'],data['result'],color=colour,marker=marker,label=label)
+        name = self.get_country_name(data.name[0])+', '+self.get_place_type_name_plural(data.name[1])
+        return ax.plot(data['session_number'],data['result'],color=colour,marker=marker, label=name)
 
 
     def _plot_separated_group(self, data, output, name):
         if len(data)>1:
             fig, ax = plt.subplots()
-            self._plot_group(data, ax, 'cyan', 'o')
             ax.set_xlabel('Session number')
             ax.set_ylabel(name, color='cyan')
-            self._plot_second_axis(data, ax)
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            l1 = self._plot_second_axis(data, ax)
+            l2 = self._plot_group(data, ax, 'cyan', 'o')
+            lines = l1+l2
+            labels = [l.get_label() for l in lines]
+            plt.legend(lines, labels, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             plt.savefig(output, bbox_inches='tight')
             plt.close()
 
 
     def _plot_second_axis(self, data, first_ax, name='Count'):
         ax = first_ax.twinx()
-        ax.plot(data['session_number'], data['count'], color = 'gray', linestyle='--', label='Count')
         ax.set_ylabel(name, color='gray')
+        return ax.plot(data['session_number'], data['counts'], color = 'gray', linestyle='--', label='Count')
+
+
+    def format_date(x, pos=None):
+        thisind = np.clip(int(x+0.5), 0, N-1)
+        return r.date[thisind].strftime('%Y-%m-%d')
 
 
     def skill(self, directory='', threshold=None, plot_individual_graphs = True):
@@ -54,7 +63,7 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.skill(self.frame,self.prior,self.codes)
+        data = analysis_per_session.average_skill(self.frame,self.prior,self.codes)
 
         if not data.empty:
             fig, ax = plt.subplots()
@@ -69,16 +78,21 @@ class Graph(Drawable):
             ax.set_ylabel('Skill')
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             plt.savefig(directory+'skill.svg', bbox_inches='tight')
-            
+            plt.close()
+
             if plot_individual_graphs:
                 if not path.exists(directory+'skill_separated/'):
                     makedirs(directory+'skill_separated/')
-                paths = [directory+'skill_separated/'+str(i)+'.svg' for i in xrange(len(data)+1)]
-                data.apply(lambda x: self._plot_separated_group(x, paths.pop(),'Skill'))
-            plt.close()
+                paths = [directory+'skill_separated/'+str(item[0])+'-'+str(item[1])+'.svg' for item in data.apply(lambda x: x.name).values]
+                def _get_default():
+                    try:
+                        return paths.pop()
+                    except IndexError:
+                        return (0,0)
+                data.apply(lambda x: self._plot_separated_group(x, _get_default(),'Skill'))
 
 
-    def success_over_session(self,directory='',threshold=None, plot_individual_graphs=True):
+    def success_over_session(self,directory='', plot_individual_graphs=True):
         """Draws graph of mean success and mean response per session.
 
         :param threshold: how many sessions to draw -- default is 10
@@ -87,7 +101,7 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.success(self.frame,self.codes,threshold)
+        data = analysis_per_session.average_success(self.frame,self.codes)
 
         if not data.empty:
             fig, ax = plt.subplots()
@@ -222,13 +236,16 @@ class Graph(Drawable):
 
         if not data.empty:
             fig, ax = plt.subplots()
-            ax.bar(data.index,data.values, color="cyan")
+            ind = arange(len(data))
+            width = 0.4
+            bars = ax.bar(ind+width/2, data.values, width=width, color="cyan")
 
-            diff = (data.max() - data.min())/10.0
-            fig.autofmt_xdate()
             ax.set_title(u"Mean success rate of users per "+frequency)
             ax.set_ylabel(u"Mean success rate")
             ax.set_xlabel(u"Date")
+            ax.set_xticks(ind+width)
+            ax.set_xticklabels(data.index.date)
+            fig.autofmt_xdate()
 
             plt.savefig(directory+'success_over_time.svg', bbox_inches='tight')
             plt.close()
@@ -246,12 +263,16 @@ class Graph(Drawable):
 
         if not data.empty:
             fig, ax = plt.subplots()
-            ax.bar(data.index,data.values, color="cyan")
+            ind = arange(len(data))
+            width = 0.4
+            bars = ax.bar(ind+width/2, data.values, width=width, color="cyan")
 
-            fig.autofmt_xdate()
             ax.set_title(u"Mean number of answers per "+frequency)
             ax.set_ylabel(u"Mean number of answers")
             ax.set_xlabel(u"Date")
+            ax.set_xticks(ind+width)
+            ax.set_xticklabels(data.index.date)
+            fig.autofmt_xdate()
 
             plt.savefig(directory+'number_of_answers_over_time.svg', bbox_inches='tight')
             plt.close()
@@ -270,11 +291,16 @@ class Graph(Drawable):
 
         if not data.empty:
             fig, ax = plt.subplots()
+            ind = arange(len(data))
+            width = 0.4
+            bars = ax.bar(ind+width/2, data.values, width=width, color="cyan")
             ax.bar(data.index,data.values, color="cyan", width=15)
 
             ax.set_title(u"Number of users per "+frequency)
             ax.set_ylabel(u"Number of users")
             ax.set_xlabel(u"Date")
+            ax.set_xticks(ind+width)
+            ax.set_xticklabels(data.index.date)
             fig.autofmt_xdate()
 
             plt.savefig(directory+'number_of_users.svg', bbox_inches='tight')
