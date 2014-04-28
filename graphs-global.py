@@ -15,10 +15,14 @@ if not path.exists(directory):
     makedirs(directory)
 
 print 'Generating global graphs'
-g.success_over_time(path=directory)
-# g.lengths_of_sessions(path=directory,threshold=15) #slow as hell on global
-g.number_of_answers_over_session(path=directory,threshold=15)
-g.number_of_answers_over_time(path=directory)
-g.number_of_users(path=directory)
-g.weekday_activity(path=directory)
-g.hourly_activity(path=directory)
+g.success_over_time(directory=directory)
+g.difficulty_histogram(directory = directory)
+g.prior_skill_histogram(directory=directory)
+g.skill(directory=directory)
+g.success_over_session(directory=directory)
+g.lengths_of_sessions(directory=directory)
+g.number_of_answers_over_session(directory=directory,threshold=15)
+g.number_of_answers_over_time(directory=directory)
+g.number_of_users(directory=directory)
+g.weekday_activity(directory=directory)
+g.hourly_activity(directory=directory)

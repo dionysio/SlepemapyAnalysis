@@ -16,12 +16,9 @@ for item in items:
         makedirs(directory)
 
     print 'Generating graphs for user',item
-    g.success_over_session(path=directory)
-    g.success_over_time(path=directory,frequency='D')
-    g.skill(path=directory)
-    g.response_time(path=directory)
-    g.lengths_of_sessions(path=directory)
-    g.number_of_answers_over_time(path=directory, frequency='D')
-    g.number_of_answers_over_session(path=directory)
-    g.weekday_activity(path=directory)
-    g.hourly_activity(path=directory)
+    g.success_over_session(directory=directory)
+    g.skill(directory=directory)
+    g.lengths_of_sessions(directory=directory)
+    g.number_of_answers_over_session(directory=directory)
+    g.weekday_activity(directory=directory)
+    g.hourly_activity(directory=directory)

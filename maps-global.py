@@ -15,8 +15,7 @@ if not path.exists(directory):
     makedirs(directory)
 
 print 'Generating global maps'
-m.average_knowledge(path=directory)
-m.success(path=directory)
-m.skill(path=directory)
-m.number_of_answers(path=directory)
-m.response_time(path=directory)
+m.average_knowledge(directory=directory)
+m.success(directory=directory)
+m.number_of_answers(directory=directory)
+m.response_time(directory=directory)

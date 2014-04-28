@@ -60,8 +60,8 @@ def calculate_difficulties(frame):
 
     first = first_questions(frame.groupby('user'))
     
-    difficulties = defaultdict(_defaultdict_factory)
-    prior_skill  = defaultdict(_defaultdict_factory)
+    difficulties = defaultdict(defaultdict_factory)
+    prior_skill  = defaultdict(defaultdict_factory)
 
     for index, answer in first.iterrows():
         update = _elo(answer,

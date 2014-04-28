@@ -16,7 +16,7 @@ for item in items:
         makedirs(directory)
 
     print 'Generating maps for user',item
-    m.knowledge(path=directory)
-    m.success(path=directory)
-    m.number_of_answers(path=directory)
-    m.response_time(path=directory)
+    m.knowledge(directory=directory)
+    m.success(directory=directory)
+    m.number_of_answers(directory=directory)
+    m.response_time(directory=directory)

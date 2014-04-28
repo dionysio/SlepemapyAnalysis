@@ -17,4 +17,4 @@ for item in items:
         makedirs(directory)
 
     print 'Generating maps for place',item
-    m.mistaken_countries(path=directory)
+    m.mistaken_countries(directory=directory)

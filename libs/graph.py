@@ -5,6 +5,7 @@ import analysis_per_country
 import analysis_per_time
 import analysis_per_session
 from common import colour_range
+from elo_rating_system import calculate_difficulties
 
 from numpy import arange, ceil
 import matplotlib.pyplot as plt
@@ -45,8 +46,8 @@ class Graph(Drawable):
 
     def _plot_second_axis(self, data, first_ax, name='Count'):
         ax = first_ax.twinx()
-        ax.set_ylabel(name, color='gray')
-        return ax.plot(data['session_number'], data['counts'], color = 'gray', linestyle='--', label='Count')
+        ax.set_ylabel(name, color='red')
+        return ax.plot(data['session_number'], data['counts'], color = 'red', linestyle='--', label='Count')
 
 
     def format_date(x, pos=None):
@@ -63,7 +64,7 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_skill(self.frame,self.prior,self.codes)
+        data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes)
 
         if not data.empty:
             fig, ax = plt.subplots()
@@ -93,7 +94,7 @@ class Graph(Drawable):
 
 
     def success_over_session(self,directory='', plot_individual_graphs=True):
-        """Draws graph of mean success and mean response per session.
+        """Draws graph of mean success per session.
 
         :param threshold: how many sessions to draw -- default is 10
         :param directory: output directory -- default is '' (current_directory)
@@ -293,11 +294,10 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
             ind = arange(len(data))
             width = 0.4
-            bars = ax.bar(ind+width/2, data.values, width=width, color="cyan")
-            ax.bar(data.index,data.values, color="cyan", width=15)
+            ax.bar(ind+width/2, data.values, width=width, color="cyan")
 
-            ax.set_title(u"Number of users per "+frequency)
-            ax.set_ylabel(u"Number of users")
+            ax.set_title(u"Number of new users per "+frequency)
+            ax.set_ylabel(u"Number of new users")
             ax.set_xlabel(u"Date")
             ax.set_xticks(ind+width)
             ax.set_xticklabels(data.index.date)
@@ -339,3 +339,39 @@ class Graph(Drawable):
 
             plt.savefig(directory+'answers_portions.svg', bbox_inches='tight')
             plt.close()
+    
+    
+    def difficulty_histogram(self, directory=''):
+        """Draws graph 
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        fig, ax = plt.subplots()
+        items = [item[0] for item in self.prior[0].itervalues()]
+        ax.hist(items)
+        ax.set_title(u"Histogram of difficulty ")
+        ax.set_ylabel(u"Number of countries")
+        ax.set_xlabel(u"Estimated difficulty")
+        plt.savefig(directory+'difficulty_histogram.svg', bbox_inches='tight')
+        plt.close()
+
+    
+    def prior_skill_histogram(self, directory=''):
+        """Draws graph 
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        fig, ax = plt.subplots()
+        items = [item[0] for item in self.prior[1].itervalues()]
+        ax.hist(items)
+        ax.set_title(u"Histogram of prior skill ")
+        ax.set_ylabel(u"Number of users")
+        ax.set_xlabel(u"Estimated prior skill")
+        plt.savefig(directory+'prior_skill_histogram.svg', bbox_inches='tight')
+        plt.close()

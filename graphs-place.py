@@ -16,5 +16,5 @@ for item in items:
         makedirs(directory)
 
     print 'Generating graphs for place',item
-    g.success_over_time(path=directory)
-    g.answer_portions(path=directory)
+    g.success_over_time(directory=directory)
+    g.answer_portions(directory=directory)

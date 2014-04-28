@@ -12,7 +12,7 @@ from kartograph import Kartograph
 
 class Map(Drawable):
 
-    def __init__(self, path='', df=None, user=None, place_asked=None, prior = None, codes=None, bounds = (50,236)):
+    def __init__(self, directory='', df=None, user=None, place_asked=None, prior = None, codes=None, bounds = (50,236)):
         """Draws world map by default. All other defaults are same as in Drawable.
         
         :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
@@ -20,7 +20,7 @@ class Map(Drawable):
 
         if not df.empty:
             df = df[(df.place_asked>=bounds[0]) & (df.place_answered<=bounds[1])]
-        Drawable.__init__(self,path,df,user,place_asked,prior,codes)
+        Drawable.__init__(self,directory,df,user,place_asked,prior,codes)
 
         config ={
             "layers": {
@@ -97,15 +97,15 @@ class Map(Drawable):
         return labels
 
 
-    def generate_css(self,data,path,optional_css=''):
+    def generate_css(self,data,directory,optional_css=''):
         """Generates css for coloring in countries.
 
         :param data: df with columns [country,rgb], where country is an ID and rgb are colour values
-        :param path: output directory
+        :param directory: output directory
         :param optional_css: append additional css at the end of the calculated css-- default is ''
         """
 
-        with open(path,'w+') as css:
+        with open(directory,'w+') as css:
             if not data.empty:
                 for index,row in data.iterrows():
                     code = self.get_country_code(row.country).upper()
@@ -126,18 +126,18 @@ class Map(Drawable):
 
 
     @staticmethod
-    def draw_bins(data,path,xy=(5,175),bin_width=15,font_size=12):
+    def draw_bins(data,directory,xy=(5,175),bin_width=15,font_size=12):
         """Draws bins into svg.
 
         :param data: data with columns [label,r,g,b] where label is text next to the bin and rgb are colour values
-        :param path: path to svg
+        :param directory: directory to svg
         :param x: starting x position of the legend
         :param y: starting y position of the legend
         :param bin_width: width of each individual bin -- default is 15
         :param font_size: font size of labels -- default is 12
         """
 
-        with copen(path,'r+','utf-8') as svg:
+        with copen(directory,'r+','utf-8') as svg:
             svg.seek(-6,2) #skip to the position right before </svg> tag
             svg.write('\n<g transform = \"translate('+str(xy[0])+' '+str(xy[1])+')\">\n') #group
             for i in range(len(data)):
@@ -151,10 +151,10 @@ class Map(Drawable):
 
 
     @staticmethod
-    def draw_title(path,title='',xy=(400,410),font_size=20,colour='black'):
+    def draw_title(directory,title='',xy=(400,410),font_size=20,colour='black'):
         """Draws title into svg.
 
-        :param path: path to svg
+        :param directory: directory to svg
         :param title: text do input into picture
         :param x: starting x position of the title
         :param y: starting y position of the title
@@ -162,147 +162,147 @@ class Map(Drawable):
         :param colour: title colour
         """
 
-        with copen(path,'r+','utf-8') as svg:
+        with copen(directory,'r+','utf-8') as svg:
             svg.seek(-6,2)
             svg.write(  '\n<text x =\"'+str(xy[0])+'\" y=\"'+str(xy[1])+'\" stroke=\"none\" font-size=\"'+
                         str(font_size)+'\" fill=\"'+colour+'\" font-family=\"sans-serif\">'+
                         title+'</text>\n</svg>')
 
 
-    def draw_map(self,path,title='',colours=None):
+    def draw_map(self,directory,title='',colours=None):
         """General drawing method through kartograph. Looks for css in current_directory+'/style.css' for styling css.
 
-        :param path: output directory
+        :param directory: output directory
         :param title: name of map
         :param colours: dataframe with colours for bins -- default is None
         """
 
         with open(self.current_directory+'/data/style.css') as css:
-            self._k.generate(self.config,outfile=path,stylesheet=css.read())
+            self._k.generate(self.config,outfile=directory,stylesheet=css.read())
         if colours is not None:
-            self.draw_bins(colours,path)
+            self.draw_bins(colours,directory)
         if title:
-            self.draw_title(path,title)
+            self.draw_title(directory,title)
 
     ############################################################################
 
 
-    def mistaken_countries(self,path='',classification_method=None,number_of_bins=6):
+    def mistaken_countries(self,directory='',classification_method=None,number_of_bins=6):
         """ Draws map of most mistaken countries for this specific one
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
+        if not directory:
+            directory = self.current_directory+'/maps/'
 
         data = analysis_per_country.mistaken_countries(self.frame)
         colours = None
         if not (data.empty or self.place_asked is None):
             place = DataFrame([[self.place_asked,(0,255,255)]],columns=['country','rgb'])
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,additional_countries=place,additional_labels=[self.get_country_name(self.place_asked)])
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'mistaken_countries.svg','Countries mistaken for '+self.get_country_name(self.place_asked),colours)
+        self.draw_map(directory+'mistaken_countries.svg','Countries mistaken for '+self.get_country_name(self.place_asked),colours)
 
 
-    def number_of_answers(self,path='',classification_method=None,number_of_bins=6):
+    def number_of_answers(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of total number of answers per country.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
+        if not directory:
+            directory = self.current_directory+'/maps/'
 
         data = analysis_per_country.number_of_answers(self.frame)
         colours = None
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins)
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'number_of_answers.svg','Number of answers',colours)
+        self.draw_map(directory+'number_of_answers.svg','Number of answers',colours)
 
 
-    def response_time(self,path='',classification_method=None,number_of_bins=6):
+    def response_time(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of mean response time per country.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
+        if not directory:
+            directory = self.current_directory+'/maps/'
 
         data = analysis_per_country.response_time(self.frame)
         colours = None
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins)
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'response_time.svg','Response time',colours)
+        self.draw_map(directory+'response_time.svg','Response time',colours)
 
 
-    def average_knowledge(self,path='',classification_method=None,number_of_bins=6):
+    def average_knowledge(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of total number of answers per country.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
-        data = analysis_per_country.average_knowledge(self.prior)[self.bounds[0]:self.bounds[1]] #filter only for world countries
+        if not directory:
+            directory = self.current_directory+'/maps/'
+        data = analysis_per_country.average_knowledge(self.prior[0])[self.bounds[0]:self.bounds[1]] #filter only for world countries
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'average_knowledge.svg','Average knowledge',colours)
+        self.draw_map(directory+'average_knowledge.svg','Average knowledge',colours)
 
 
-    def knowledge(self,path='',classification_method=None,number_of_bins=6):
+    def knowledge(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of user knowledge.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
-        data = analysis_per_country.knowledge(self.frame,self.prior)
+        if not directory:
+            directory = self.current_directory+'/maps/'
+        data = analysis_per_country.knowledge(self.frame,self.prior[0])
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'knowledge.svg','Knowledge ',colours)
+        self.draw_map(directory+'knowledge.svg','Knowledge ',colours)
 
 
-    def success(self,path='',classification_method=None,number_of_bins=6):
+    def success(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of mean success rate per country.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
-        :param path: output directory -- default is '' (current dir)
+        :param directory: output directory -- default is '' (current dir)
         :param number_of_bins: how many bins to divide data into-- default is 6
         """
 
-        if not path:
-            path = self.current_directory+'/maps/'
+        if not directory:
+            directory = self.current_directory+'/maps/'
         data = analysis_per_country.success(self.frame)
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,colour_range="RdYlGn")
-            self.generate_css(data[['country','rgb']],path=self.current_directory+'/data/style.css')
+            self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(path+'success.svg','Success',colours)
+        self.draw_map(directory+'success.svg','Success',colours)

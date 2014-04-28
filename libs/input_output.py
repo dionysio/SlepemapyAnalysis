@@ -80,7 +80,7 @@ def get_arguments(directory, require_items=True):
         prior = load_prior(path=working_directory+'/data/prior.yaml')
     else:
         frame = frame.groupby('user').apply(add_session_numbers)
-        prior = calculate_difficulties(frame)[0]
+        prior = calculate_difficulties(frame)
         save_prior(prior,working_directory+'/data/prior.yaml')
     
     if require_items:
