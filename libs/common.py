@@ -3,6 +3,7 @@
 from colorsys import hsv_to_rgb
 from numpy import timedelta64
 from math import exp
+from random import shuffle
 
 """Assorted methods used in different modules
 """
@@ -14,6 +15,7 @@ def colour_range(length,hue_limit=1.0):
     :param hue_limit: limits the hue value -- default 0.32
     """
     colors = [hsv_to_rgb((hue_limit*x)/length,1,1) for x in range(length)]
+    shuffle(colors)
     return colors
 
 

@@ -11,7 +11,7 @@ from os import path
 
 
 def load_answer_csv(path):
-    """Imports csv into pandas DataFrame
+    """Imports answer csv into pandas DataFrame
 
     default dtypes:
 
@@ -32,14 +32,24 @@ def load_answer_csv(path):
 
 
 def load_place_csv(path):
-    """Used for importing general csv
-
-    :param names: new names for columns
-    :param enc: encoding of csv file
+    """Used for importing csv of places
     """
 
     types = {'id':uint32,'code':object,'name':object,'type':uint8}
     return read_csv(path,encoding='utf-8', dtype = types)
+
+
+def load_ab_csv(path, ab = ('recommendation_by_additive_function','recommendation_by_random')):
+    '''Used for importing csv of AB testing. 
+    
+    :param ab: used as tuple for two names of AB values
+    '''
+    types = {'ab_id':uint32, 'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map_id':float16,'ip_address':object, 'ab_value':object}
+    both = read_csv(path, parse_dates=[6],dtype=types,index_col='id')
+    both.rename(columns={'place_map_id':'place_map'}, inplace=True)
+    a = both[both.ab_value == ab[0]]
+    b = both[both.ab_value == ab[1]]
+    return (both[both.ab_value == ab[0]],both[both.ab_value == ab[1]])
 
 
 def save_prior(out, path):

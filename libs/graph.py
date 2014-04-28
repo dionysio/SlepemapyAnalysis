@@ -65,7 +65,7 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes)
-        data.result = data.apply(logis)
+        data.result = data.result.apply(logis)
         if not data.empty:
             fig, ax = plt.subplots()
 
