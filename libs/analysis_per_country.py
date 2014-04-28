@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from elo_rating_system import estimate_current_knowledge, _logis
+from elo_rating_system import estimate_current_knowledge
+from common import logis
 from pandas import Series
 
 

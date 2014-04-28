@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from common import add_session_numbers, defaultdict_factory, first_questions
+from common import add_session_numbers, defaultdict_factory, first_questions, logis
 
-from math import exp
 from collections import defaultdict
 
-
-def _logis(value):
-    return (1.0 / (1 + exp(-value)))
 
 
 def _elo(answer, prior_skill, user_number_of_answers, difficulty, place_number_of_answers):
@@ -26,7 +22,7 @@ def _elo(answer, prior_skill, user_number_of_answers, difficulty, place_number_o
         guess = 1.0/answer['number_of_options']
     else:
         guess = 0
-    prediction = guess + (1-guess) * _logis(prior_skill-difficulty)
+    prediction = guess + (1-guess) * logis(prior_skill-difficulty)
     result = answer['place_asked'] == answer['place_answered']
 
     k_func = lambda x: 1.0/(1+0.05*x)

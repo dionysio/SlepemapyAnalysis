@@ -4,10 +4,9 @@ from drawable import Drawable
 import analysis_per_country
 import analysis_per_time
 import analysis_per_session
-from common import colour_range
-from elo_rating_system import calculate_difficulties
+from common import colour_range, logis
 
-from numpy import arange, ceil
+from numpy import arange, ceil, log
 import matplotlib.pyplot as plt
 from matplotlib import interactive
 from matplotlib import rc
@@ -47,7 +46,8 @@ class Graph(Drawable):
     def _plot_second_axis(self, data, first_ax, name='Count'):
         ax = first_ax.twinx()
         ax.set_ylabel(name, color='red')
-        return ax.plot(data['session_number'], data['counts'], color = 'red', linestyle='--', label='Count')
+        ax.set_yscale('log')
+        return ax.plot(data['session_number'], log(data['counts']), color = 'red', linestyle='--', label='Count')
 
 
     def format_date(x, pos=None):
@@ -65,7 +65,7 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes)
-
+        data.result = data.apply(logis)
         if not data.empty:
             fig, ax = plt.subplots()
 
@@ -361,7 +361,7 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         fig, ax = plt.subplots()
-        items = [item[0] for item in self.prior[1].itervalues()]
+        items = [logis(item[0]) for item in self.prior[1].itervalues()]
         ax.hist(items)
         ax.set_title(u"Histogram of prior skill ")
         ax.set_ylabel(u"Number of users")

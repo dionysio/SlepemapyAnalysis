@@ -2,6 +2,7 @@
 
 from colorsys import hsv_to_rgb
 from numpy import timedelta64
+from math import exp
 
 """Assorted methods used in different modules
 """
@@ -14,6 +15,10 @@ def colour_range(length,hue_limit=1.0):
     """
     colors = [hsv_to_rgb((hue_limit*x)/length,1,1) for x in range(length)]
     return colors
+
+
+def logis(value):
+    return (1.0 / (1 + exp(-value)))
 
 
 def add_session_numbers(frame,session_duration=timedelta64(30, 'm')):
