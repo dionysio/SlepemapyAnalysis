@@ -40,7 +40,7 @@ class Graph(Drawable):
             lines = l1+l2
             labels = [l.get_label() for l in lines]
             plt.legend(lines, labels, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            plt.savefig(output, bbox_inches='tight')
+            plt.savefig(output+labels[1]+'.svg', bbox_inches='tight')
             plt.close()
 
 
@@ -84,13 +84,7 @@ class Graph(Drawable):
             if plot_individual_graphs:
                 if not path.exists(directory+'skill_separated/'):
                     makedirs(directory+'skill_separated/')
-                paths = [directory+'skill_separated/'+str(item[0])+'-'+str(item[1])+'.svg' for item in data.apply(lambda x: x.name).values]
-                def _get_default():
-                    try:
-                        return paths.pop()
-                    except IndexError:
-                        return (0,0)
-                data.apply(lambda x: self._plot_separated_group(x, _get_default(),'Skill'))
+                data.apply(lambda x: self._plot_separated_group(x, directory+'skill_separated/','Skill'))
 
 
     def success_over_session(self,directory='', plot_individual_graphs=True):
@@ -121,8 +115,7 @@ class Graph(Drawable):
             if plot_individual_graphs:
                 if not path.exists(directory+'success_separated/'):
                     makedirs(directory+'success_separated/')
-                paths = [directory+'success_separated/'+str(i)+'.svg' for i in xrange(len(data)+1)]
-                data.apply(lambda x: self._plot_separated_group(x, paths.pop(),'Success'))
+                data.apply(lambda x: self._plot_separated_group(x, directory+'success_separated/','Success'))
             plt.close()
 
 
