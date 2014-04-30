@@ -9,10 +9,10 @@ from random import shuffle
 """
 
 def colour_range(length,hue_limit=1.0):
-    """Generates range of colours.
+    """Generates shuffled range of colours.
 
     :param length: how many colours to generate
-    :param hue_limit: limits the hue value -- default 0.32
+    :param hue_limit: limits the hue value -- default is 1.0 (no limit)
     """
     colors = [hsv_to_rgb((hue_limit*x)/length,1,1) for x in range(length)]
     shuffle(colors)
@@ -20,6 +20,8 @@ def colour_range(length,hue_limit=1.0):
 
 
 def logis(value):
+    """Logistic function
+    """
     return (1.0 / (1 + exp(-value)))
 
 

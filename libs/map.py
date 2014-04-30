@@ -11,11 +11,10 @@ from kartograph import Kartograph
 
 
 class Map(Drawable):
-
     def __init__(self, directory='', df=None, user=None, place_asked=None, prior = None, codes=None, bounds = (50,236)):
         """Draws world map by default. All other defaults are same as in Drawable.
-        
-        :param codes: basically geography.places.csv, it has information about codes of countries defined by ISO_3166-1_alpha-2 -- default None -- default None
+
+        :param bounds: filters answers by place_asked -- default is (50,236) -- only countries
         """
 
         if not df.empty:
@@ -40,6 +39,7 @@ class Map(Drawable):
     def set_config(self,config):
         self.config = config
 
+
     @staticmethod
     def bin_data(data,classification_method=None,number_of_bins=6,
             additional_countries=None,additional_labels=[],colour_range="YlOrRd"):
@@ -48,11 +48,9 @@ class Map(Drawable):
         :param data: values to bin
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
         :param number_of_bins: how many bins to divide data-- default is 6
-        :param reverse_colours: whether to reverse generated color scheme
         :param additional_countries: whether to add additional countries AFTER binning -- default is None
         :param additional_labels: whether to add additional labels AFTER calculations -- default is []
-        :param colours: use these colours instead of predefined ones
-
+        :param colour_range: use this colorbrewer colour range
         """
 
         if classification_method is None:
@@ -152,7 +150,7 @@ class Map(Drawable):
 
     @staticmethod
     def draw_title(directory,title='',xy=(400,410),font_size=20,colour='black'):
-        """Draws title into svg.
+        """Draws title into svg map.
 
         :param directory: directory to svg
         :param title: text do input into picture

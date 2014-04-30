@@ -8,7 +8,6 @@ from elo_rating_system import estimate_prior_knowledge
 
 def lengths_of_sessions(frame,threshold=None):
     """Returns length of each session.
-
     """
 
     groups = frame.groupby('user')
@@ -16,14 +15,13 @@ def lengths_of_sessions(frame,threshold=None):
         groups = get_session_length(frame)
     else:
         groups = groups.apply(get_session_length)
-    groups = groups.reset_index()
 
-    maximum = groups.session_number.value_counts().max()
-    groups = groups.groupby('session_number')
+    groups = groups.reset_index().groupby('session_number')
     if threshold is None:
-        groups = (groups.apply(lambda x: x.inserted.sum()/maximum))
+        groups = concat([groups.session_number.apply(len), groups.apply(lambda x: x.inserted.sum()/float(len(x)))],axis=1)
     else:
-        groups = (groups.apply(lambda x: x.inserted.sum()/maximum)).head(n=threshold)
+        groups = concat([groups.session_number.apply(len), (groups.apply(lambda x: x.inserted.sum()/float(len(x)))).head(n=threshold)],axis=1)
+    groups.columns = ['counts','result']
     return groups
 
 
@@ -55,7 +53,7 @@ def _prepare_places(frame, codes):
 
 
 def _success(frame):
-    '''Returns success for one 
+    '''Returns success rate of one specific user for every session (only first questions in session count).
     '''
     first = first_questions(frame.groupby('session_number'))
     first = first.groupby('session_number')
@@ -64,9 +62,7 @@ def _success(frame):
 
 
 def success(frame, codes):
-    """Returns progress of mean_success_rate over sessions, expects only one user.
-
-    :param threshold: consider only this many sessions
+    """Returns progress of success rate over sessions groupped by 'session_number','place_map','place_type'.
     """
 
     data = _prepare_places(frame, codes)
@@ -79,7 +75,7 @@ def success(frame, codes):
 
 
 def skill(frame, difficulties, codes):
-    """
+    """Returns progress of prior skill over sessions, expects only one user.
     """
 
     data = _prepare_places(frame, codes)
@@ -89,10 +85,9 @@ def skill(frame, difficulties, codes):
 
 
 def average_success(frame, codes):
-    """Returns progress of mean_success_rate over sessions.
-
-    :param threshold: consider only this many sessions
+    """Returns progress of mean success rate over sessions.
     """
+
     data = frame.groupby('user')
     data = data.apply(lambda x: success(x, codes))
     data = data.reset_index()
@@ -103,10 +98,9 @@ def average_success(frame, codes):
 
 
 def average_skill(frame, difficulties, codes):
-    """Returns progress of mean_success_rate over sessions.
-
-    :param threshold: consider only this many sessions
+    """Returns progress of mean prior skill over sessions.
     """
+
     data = frame.groupby('user')
     data = data.apply(lambda x: skill(x, difficulties, codes))
     data = data.reset_index()

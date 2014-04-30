@@ -14,9 +14,8 @@ import colorbrewer
 from os import path, makedirs
 
 class Graph(Drawable):
-
     def __init__(self, path='', df=None, user=None, place_asked=None, prior=None, codes= None):
-        """Sets matplotlib to be non-interactive. All other defaults are same as in Drawable.
+        """Sets matplotlib to be non-interactive and default font to Times New Roman. All other defaults are same as in Drawable.
         """
 
         Drawable.__init__(self, path, df, user, place_asked, prior, codes)
@@ -24,12 +23,27 @@ class Graph(Drawable):
         rc('font', **{'sans-serif' : 'Times New Roman','family' : 'sans-serif'})
 
 
-    def _plot_group(self,data, ax, colour, marker):
+    def _plot_group(self, data, ax, colour, marker):
+        """Plots data.result over data.session_number on prepared ax
+        
+        :param data: what to plot
+        :param ax: where to plot
+        :param colour: colour of curve
+        :param marker: marker of points on curve
+        """
+
         name = self.get_country_name(data.name[0])+', '+self.get_place_type_name_plural(data.name[1])
         return ax.plot(data['session_number'],data['result'],color=colour,marker=marker, label=name)
 
 
     def _plot_separated_group(self, data, output, name):
+        """Plots group (data.result over data.session_number) in separated graph with labels, second axis and legend.
+        
+        :param data: what to plot
+        :param output: output directory
+        :param name: label name for Y axis (result)
+        """
+
         if len(data)>1:
             fig, ax = plt.subplots()
             ax.set_xlabel('Session number')
@@ -43,23 +57,25 @@ class Graph(Drawable):
             plt.close()
 
 
-    def _plot_second_axis(self, data, first_ax, name='Count'):
+    def _plot_second_axis(self, data, first_ax, name='Log of count'):
+        """Plots second axis of log of data.counts over data.session_number. Uses symlog for yscale
+        
+        :param data: what to plot
+        :param first_ax: where to plot
+        :param name: label name for second Y axis (data.counts) -- default is 'Log of count'
+        """
+
         ax = first_ax.twinx()
         ax.set_ylabel(name, color='red')
-        ax.set_yscale('log')
+        ax.set_yscale('symlog')
         return ax.plot(data['session_number'], log(data['counts']), color = 'red', linestyle='--', label='Count')
 
 
-    def format_date(x, pos=None):
-        thisind = np.clip(int(x+0.5), 0, N-1)
-        return r.date[thisind].strftime('%Y-%m-%d')
+    def skill(self, directory='', plot_individual_graphs = True):
+        """Draws graph of mean skill per session.
 
-
-    def skill(self, directory='', threshold=None, plot_individual_graphs = True):
-        """Draws graph of mean skill and mean response time per session.
-
-        :param threshold: how many sessions to draw -- default is 10
         :param directory: output directory -- default is '' (current_directory)
+        :param plot_individual_graphs: whether to also draw separated graphs for each curve -- default is True
         """
 
         if not directory:
@@ -90,8 +106,8 @@ class Graph(Drawable):
     def success_over_session(self,directory='', plot_individual_graphs=True):
         """Draws graph of mean success per session.
 
-        :param threshold: how many sessions to draw -- default is 10
         :param directory: output directory -- default is '' (current_directory)
+        :param plot_individual_graphs: whether to also draw separated graphs for each curve -- default is True
         """
 
         if not directory:
@@ -132,8 +148,9 @@ class Graph(Drawable):
         if not data.empty:
             fig, ax = plt.subplots()
 
-            ax.bar(range(len(data)),data.values, color="cyan")
-            
+            data = data.reset_index()
+            ax.bar(range(len(data)),data.result, color="cyan")
+            self._plot_second_axis(data, ax)
             ax.set_title(u"Lengths of sessions over time")
             ax.set_ylabel(u"Session length [seconds]")
             ax.set_xlabel(u"Session number")
@@ -219,9 +236,10 @@ class Graph(Drawable):
 
 
     def success_over_time(self, directory ='',frequency='M'):
-        """Draws graph
+        """Draws graph of mean success rate over time.
 
         :param directory: output directory -- default is '' (current_directory)
+        :param frequency: describes over what time period to sample, use only 'M'/'W'/'D'!
         """
         
         if not directory:
@@ -246,9 +264,10 @@ class Graph(Drawable):
 
 
     def number_of_answers_over_time(self, directory='', frequency='M'):
-        """Draws graph
+        """Draws graph of mean number of answers over time.
 
         :param directory: output directory -- default is '' (current_directory)
+        :param frequency: describes over what time period to sample, use only 'M'/'W'/'D'!
         """
         
         if not directory:
@@ -273,9 +292,9 @@ class Graph(Drawable):
 
 
     def number_of_users(self, directory ='', frequency = 'M'):
-        """Draws graph
+        """Draws graph of number of users over time
 
-        :param frequency: defines sampling value - all available frequencies are available at pandas documentation (http://pandas.pydata.org/pandas-docs/stable/timeseries.html#dateoffset-objects) -- default is 'M' == month
+        :param frequency: describes over what time period to sample, use only 'M'/'W'/'D'!
         :param directory: output directory -- default is '' (current_directory)
         """
         
@@ -304,9 +323,9 @@ class Graph(Drawable):
 
 
     def answer_portions(self, directory='', threshold=0.01):
-        """Draws graph 
+        """Draws pie chart of portions of answers to specific country.
 
-        :param threshold: how many sessions to draw -- default is 10
+        :param threshold: limit of values to include as separate slice
         :param directory: output directory -- default is '' (current_directory)
         """
 
@@ -335,7 +354,7 @@ class Graph(Drawable):
     
     
     def difficulty_histogram(self, directory=''):
-        """Draws graph 
+        """Draws histogram of difficulties. 
 
         :param directory: output directory -- default is '' (current_directory)
         """
@@ -353,7 +372,7 @@ class Graph(Drawable):
 
     
     def prior_skill_histogram(self, directory=''):
-        """Draws graph 
+        """Draws graph of prior skill.
 
         :param directory: output directory -- default is '' (current_directory)
         """

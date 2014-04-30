@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libs.input_output &mdash; Slepe Mapy Analysis 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Slepe Mapy Analysis 0.9 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe Mapy Analysis 0.9 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libs.input_output</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">elo_rating_system</span> <span class="kn">import</span> <span class="n">calculate_difficulties</span>
+<span class="kn">from</span> <span class="nn">common</span> <span class="kn">import</span> <span class="n">add_session_numbers</span><span class="p">,</span> <span class="n">defaultdict_factory</span>
+
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">uint32</span><span class="p">,</span><span class="n">uint16</span><span class="p">,</span><span class="n">uint8</span><span class="p">,</span><span class="n">float16</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_csv</span><span class="p">,</span> <span class="n">unique</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">dump</span><span class="p">,</span><span class="n">load</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+
+
+<div class="viewcode-block" id="load_answer_csv"><a class="viewcode-back" href="../../libs.html#libs.input_output.load_answer_csv">[docs]</a><span class="k">def</span> <span class="nf">load_answer_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Imports answer csv into pandas DataFrame</span>
+
+<span class="sd">    default dtypes:</span>
+
+<span class="sd">    - &#39;user&#39;:uint32</span>
+<span class="sd">    - &#39;id&#39;:uint32</span>
+<span class="sd">    - &#39;place_asked&#39;:uint16</span>
+<span class="sd">    - &#39;place_answered&#39;:float16 -- has to be float, because uint does not understand NaN (which place_answered may contain)</span>
+<span class="sd">    - &#39;type&#39;:uint8</span>
+<span class="sd">    - &#39;response_time&#39;:uint32</span>
+<span class="sd">    - &#39;number_of_options&#39;:uint8</span>
+<span class="sd">    - &#39;place_map&#39;:float16 -- has to be float, because uint does not understand NaN (which place_map may contain)</span>
+<span class="sd">    - &#39;ip_address&#39;:object</span>
+<span class="sd">    </span>
+<span class="sd">    :param path: load csv from this path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;user&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;place_asked&#39;</span><span class="p">:</span><span class="n">uint16</span><span class="p">,</span><span class="s">&#39;place_answered&#39;</span><span class="p">:</span><span class="n">float16</span><span class="p">,</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">uint8</span><span class="p">,</span><span class="s">&#39;response_time&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;number_of_options&#39;</span><span class="p">:</span><span class="n">uint8</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">:</span><span class="n">float16</span><span class="p">,</span><span class="s">&#39;ip_address&#39;</span><span class="p">:</span><span class="nb">object</span><span class="p">}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">types</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+</div>
+<div class="viewcode-block" id="load_place_csv"><a class="viewcode-back" href="../../libs.html#libs.input_output.load_place_csv">[docs]</a><span class="k">def</span> <span class="nf">load_place_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used for importing csv of places</span>
+<span class="sd">    </span>
+<span class="sd">    :param path: load csv from this path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;code&#39;</span><span class="p">:</span><span class="nb">object</span><span class="p">,</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="nb">object</span><span class="p">,</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">uint8</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">types</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="load_ab_csv"><a class="viewcode-back" href="../../libs.html#libs.input_output.load_ab_csv">[docs]</a><span class="k">def</span> <span class="nf">load_ab_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Used for importing csv of AB testing. Splits dataframe into N categories based on its ab_value column. </span>
+<span class="sd">    Expects same csv as answer, but with two additional columns:</span>
+<span class="sd">    - &#39;ab_id&#39;:uint32</span>
+<span class="sd">    - &#39;ab_value&#39;:object</span>
+<span class="sd">    </span>
+<span class="sd">    :param path: load csv from this path</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;ab_id&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;place_asked&#39;</span><span class="p">:</span><span class="n">uint16</span><span class="p">,</span><span class="s">&#39;place_answered&#39;</span><span class="p">:</span><span class="n">float16</span><span class="p">,</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="n">uint8</span><span class="p">,</span><span class="s">&#39;response_time&#39;</span><span class="p">:</span><span class="n">uint32</span><span class="p">,</span><span class="s">&#39;number_of_options&#39;</span><span class="p">:</span><span class="n">uint8</span><span class="p">,</span><span class="s">&#39;place_map_id&#39;</span><span class="p">:</span><span class="n">float16</span><span class="p">,</span><span class="s">&#39;ip_address&#39;</span><span class="p">:</span><span class="nb">object</span><span class="p">,</span> <span class="s">&#39;ab_value&#39;</span><span class="p">:</span><span class="nb">object</span><span class="p">}</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">types</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+    <span class="n">frame</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;place_map_id&#39;</span><span class="p">:</span><span class="s">&#39;place_map&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">unique</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">ab_values</span><span class="p">):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">ab_value</span> <span class="o">==</span> <span class="n">element</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="save_prior"><a class="viewcode-back" href="../../libs.html#libs.input_output.save_prior">[docs]</a><span class="k">def</span> <span class="nf">save_prior</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates and saves difficulties of countries into json file.</span>
+
+<span class="sd">    :param frame: calculate from this frame</span>
+<span class="sd">    :param path: save to this path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">diff</span><span class="p">:</span>
+        <span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span><span class="n">diff</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="load_prior"><a class="viewcode-back" href="../../libs.html#libs.input_output.load_prior">[docs]</a><span class="k">def</span> <span class="nf">load_prior</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns difficulties and prior_skills of places by loading yaml file</span>
+
+<span class="sd">    :param path: load yaml from this path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">diff</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="get_arguments"><a class="viewcode-back" href="../../libs.html#libs.input_output.get_arguments">[docs]</a><span class="k">def</span> <span class="nf">get_arguments</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">require_items</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parses arguments from command line (-f for directory and -i for items) and returns them as tuple.</span>
+<span class="sd">    </span>
+<span class="sd">    :param directory: load from this directory as default (if -f is not specified)</span>
+<span class="sd">    :param require_items: whether to is item argument required</span>
+<span class="sd">    :returns: (items, frame, prior, codes, working_directory)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span> <span class="s">&#39;--file&#39;</span><span class="p">,</span> <span class="n">metavar</span> <span class="o">=</span> <span class="s">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;Optional path to directory with geography-answer.csv and prior.yaml&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">require_items</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;-i&#39;</span><span class="p">,</span> <span class="s">&#39;--items&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">metavar</span> <span class="o">=</span> <span class="s">&#39;ITEMS&#39;</span><span class="p">,</span><span class="n">nargs</span><span class="o">=</span><span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;id of an item to filter&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="n">directory</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">file</span>
+    
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">load_answer_csv</span><span class="p">(</span><span class="n">working_directory</span><span class="o">+</span><span class="s">&quot;/data/geography.answer.csv&quot;</span><span class="p">)</span>
+    <span class="n">codes</span> <span class="o">=</span> <span class="n">load_place_csv</span><span class="p">(</span><span class="n">working_directory</span><span class="o">+</span><span class="s">&#39;/data/geography.place.csv&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">working_directory</span><span class="o">+</span><span class="s">&#39;/data/prior.yaml&#39;</span><span class="p">):</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">load_prior</span><span class="p">(</span><span class="n">working_directory</span><span class="o">+</span><span class="s">&#39;/data/prior.yaml&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">add_session_numbers</span><span class="p">)</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">calculate_difficulties</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">save_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span><span class="n">working_directory</span><span class="o">+</span><span class="s">&#39;/data/prior.yaml&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">require_items</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">working_directory</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">working_directory</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe Mapy Analysis 0.9 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

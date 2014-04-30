@@ -5,7 +5,7 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=DZ]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=AO]{
 	fill: 'rgb(254, 217, 118)';
@@ -104,7 +104,7 @@
 	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=ET]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=FK]{
 	fill: 'rgb(254, 178, 76)';
@@ -131,13 +131,13 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=GH]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=GL]{
 	fill: 'rgb(255, 255, 178)';
 }
 .states[iso_a2=GE]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=GT]{
 	fill: 'rgb(254, 217, 118)';
@@ -197,7 +197,7 @@
 	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=ZA]{
-	fill: 'rgb(254, 217, 118)';
+	fill: 'rgb(255, 255, 178)';
 }
 .states[iso_a2=KR]{
 	fill: 'rgb(254, 178, 76)';
@@ -218,7 +218,7 @@
 	fill: 'rgb(255, 255, 178)';
 }
 .states[iso_a2=QA]{
-	fill: 'rgb(253, 141, 60)';
+	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=KZ]{
 	fill: 'rgb(254, 178, 76)';
@@ -347,7 +347,7 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=PS]{
-	fill: 'rgb(240, 59, 32)';
+	fill: 'rgb(253, 141, 60)';
 }
 .states[iso_a2=PA]{
 	fill: 'rgb(254, 217, 118)';
@@ -389,7 +389,7 @@
 	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=GR]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=SV]{
 	fill: 'rgb(254, 217, 118)';
@@ -398,7 +398,7 @@
 	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=SN]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=KP]{
 	fill: 'rgb(254, 178, 76)';
@@ -443,13 +443,13 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=SB]{
-	fill: 'rgb(253, 141, 60)';
+	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=ES]{
 	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=LK]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=SE]{
 	fill: 'rgb(254, 217, 118)';
@@ -458,7 +458,7 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=TJ]{
-	fill: 'rgb(253, 141, 60)';
+	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=TZ]{
 	fill: 'rgb(254, 178, 76)';
@@ -485,7 +485,7 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=UA]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=UY]{
 	fill: 'rgb(254, 217, 118)';
@@ -506,7 +506,7 @@
 	fill: 'rgb(254, 178, 76)';
 }
 .states[iso_a2=EH]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=ZW]{
 	fill: 'rgb(254, 217, 118)';
@@ -533,13 +533,16 @@
 	fill: 'rgb(255, 255, 178)';
 }
 .states[iso_a2=CZ-KA]{
-	fill: 'rgb(254, 178, 76)';
+	fill: 'rgb(254, 217, 118)';
 }
 .states[iso_a2=CZ-JC]{
 	fill: 'rgb(189, 0, 38)';
 }
 .states[iso_a2=CZ-VY]{
-	fill: 'rgb(253, 141, 60)';
+	fill: 'rgb(254, 178, 76)';
+}
+.states[iso_a2=CZ-PR]{
+	fill: 'rgb(189, 0, 38)';
 }
 .states[iso_a2=CZ-ST]{
 	fill: 'rgb(255, 255, 178)';
@@ -554,11 +557,11 @@
 	fill: 'rgb(255, 255, 178)';
 }
 .states[iso_a2=-99]{
-	fill: 'rgb(189, 0, 38)';
+	fill: 'rgb(240, 59, 32)';
 }
 .states[iso_a2=TT]{
-	fill: 'rgb(240, 59, 32)';
+	fill: 'rgb(253, 141, 60)';
 }
 .states[iso_a2=VU]{
-	fill: 'rgb(240, 59, 32)';
+	fill: 'rgb(253, 141, 60)';
 }

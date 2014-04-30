@@ -1,0 +1,79 @@
+libs.analysis_per_country module
+--------------------------------
+
+.. automodule:: libs.analysis_per_country
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.analysis_per_session module
+--------------------------------
+
+.. automodule:: libs.analysis_per_session
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.analysis_per_time module
+-----------------------------
+
+.. automodule:: libs.analysis_per_time
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.classification_methods module
+----------------------------------
+
+.. automodule:: libs.classification_methods
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.common module
+------------------
+
+.. automodule:: libs.common
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.drawable module
+--------------------
+
+.. automodule:: libs.drawable
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.elo_rating_system module
+-----------------------------
+
+.. automodule:: libs.elo_rating_system
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.graph module
+-----------------
+
+.. automodule:: libs.graph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.input_output module
+------------------------
+
+.. automodule:: libs.input_output
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+libs.map module
+---------------
+
+.. automodule:: libs.map
+    :members:
+    :undoc-members:
+    :show-inheritance:

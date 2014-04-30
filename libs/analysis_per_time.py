@@ -24,6 +24,9 @@ def hourly_activity(frame):
 
 
 def _success(frame, frequency='M'):
+    """Returns success rate for specific time period
+    """
+
     if frequency == 'M':
         result = frame[frame.inserted[0]:frame.inserted[0]+DateOffset(months=1)]
     elif frequency== 'W':
@@ -34,6 +37,9 @@ def _success(frame, frequency='M'):
 
 
 def success(frame, frequency = 'M'):
+    """Returns success rate for every time period
+    """
+
     result = frame.set_index(DatetimeIndex(frame.inserted))
     if frequency=='M':
         result = result.groupby(['user',lambda x: x.year,lambda x: x.month])
@@ -47,7 +53,11 @@ def success(frame, frequency = 'M'):
     result.index = result.index - DateOffset(days=1)
     return result
 
+
 def number_of_users(frame, frequency = 'M'):
+    """Returns number of users for every time period
+    """
+
     times = frame.groupby('user').apply(lambda x: x.inserted.values[0])
     times = times.reset_index()
     times = times.set_index(DatetimeIndex(times[0]))
@@ -55,6 +65,9 @@ def number_of_users(frame, frequency = 'M'):
 
 
 def number_of_answers(frame, frequency= 'M'):
+    """Returns number of answers for every time period
+    """
+
     result = frame.set_index(DatetimeIndex(frame.inserted))
     if frequency=='M':
         result = result.groupby(['user',lambda x: x.year,lambda x: x.month])

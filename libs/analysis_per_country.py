@@ -6,23 +6,23 @@ from pandas import Series
 
 
 def average_knowledge(difficulties):
-    """Returns predicted probabilities of success for average user.
+    """Returns predicted probabilities of success for new user.
     """
 
     result = []
     for item in difficulties.iteritems():
-        result += [_logis(-item[1][0])]
+        result += [logis(-item[1][0])]
     return Series(result,index=difficulties.keys())
 
 
 def knowledge(frame,difficulties):
-    """User-specific probabilities of success.
+    """User-specific predicted probabilities of success.
     """
     
     skills = estimate_current_knowledge(frame,difficulties)
     result = []
     for item in skills.iteritems():
-        result += [_logis(item[1][0] - difficulties[item[0]][0])]
+        result += [logis(item[1][0] - difficulties[item[0]][0])]
     return Series(result,index=skills.keys())
 
 
@@ -69,7 +69,7 @@ def mistaken_countries(frame, threshold=None):
 
 
 def success(frame):
-    """Returns mean_success_rate for each country.
+    """Returns mean success rate for each country.
     """
 
     groups = frame.groupby('place_asked')
@@ -78,6 +78,11 @@ def success(frame):
 
 
 def answer_portions(frame, threshold=None):
+    """Returns portions of answers for specific country.
+    
+    :param threshold: limit of values to include as separate slice -- default is None
+    """
+
     mistaken = mistaken_countries(frame)
     mistaken = mistaken.append(Series({frame.place_asked[0]: len(frame[frame.place_asked==frame.place_answered])}))
     mistaken = mistaken/float(mistaken.sum())

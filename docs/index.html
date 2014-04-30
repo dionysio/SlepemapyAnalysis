@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Slepe Mapy Analysis’s documentation! &mdash; Slepe Mapy Analysis 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Slepe Mapy Analysis 0.9 documentation" href="#" />
+    <link rel="next" title="libs.analysis_per_country module" href="libs.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="libs.html" title="libs.analysis_per_country module"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Slepe Mapy Analysis 0.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-slepe-mapy-analysis-s-documentation">
+<h1>Welcome to Slepe Mapy Analysis&#8217;s documentation!<a class="headerlink" href="#welcome-to-slepe-mapy-analysis-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>SlepemapyAnalysis is a Python tool used for data analysis, map and graph visualisations. It uses data obtained from users learning geography through adaptive system available on <a class="reference external" href="http://www.slepemapy.cz">Slepemapy</a>.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>All of the requirements are listed in requirements.txt. Some of them (namely <a class="reference external" href="https://pypi.python.org/pypi/GDAL/">GDAL</a>, <a class="reference external" href="http://kartograph.org/docs/kartograph.py/">kartograph</a>) will probably not install automatically through pip.</p>
+<p>You will also need the data from geography.answer.csv, geography.places.csv and shapefiles of regions. Included shapefiles are originally from <a class="reference external" href="http://www.naturalearthdata.com/">Natural Earth Data</a>.</p>
+</div>
+<div class="section" id="usage-example">
+<h2>Usage example<a class="headerlink" href="#usage-example" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">There are 3 types of filtering: by user, by place, global. There are also 2 types of visualisations - maps and graphs. You can combine those to generate predefined graphs/maps by call from command line:</div>
+<div class="line">python [graphs/maps]-[user/place/global].py -i …</div>
+</div>
+<div class="line-block">
+<div class="line">So for example, if you want to generate graphs for 5 specific users, you can run from commandline:</div>
+<div class="line">python graphs-user.py -i 10 25 2277 96 156</div>
+</div>
+<p>Those generators expect you have geography.answer.csv and geography.places.csv</p>
+</div>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="libs.html">libs.analysis_per_country module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.analysis_per_session">libs.analysis_per_session module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.analysis_per_time">libs.analysis_per_time module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.classification_methods">libs.classification_methods module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.common">libs.common module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.drawable">libs.drawable module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.elo_rating_system">libs.elo_rating_system module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.graph">libs.graph module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.input_output">libs.input_output module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libs.html#module-libs.map">libs.map module</a></li>
+</ul>
+</div>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Slepe Mapy Analysis&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#usage-example">Usage example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="libs.html"
+                        title="next chapter">libs.analysis_per_country module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="libs.html" title="libs.analysis_per_country module"
+             >next</a> |</li>
+        <li><a href="#">Slepe Mapy Analysis 0.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
