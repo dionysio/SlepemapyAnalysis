@@ -51,6 +51,10 @@ class Drawable():
         return self.get_country_record(id)['code'].values[0]
 
 
+    def get_label(self, mapa, type):
+        return self.get_country_name(mapa)+', '+self.get_place_type_name_plural(type)
+
+
     def get_country_name(self,id):
         return self.get_country_record(id)['name'].values[0]
 

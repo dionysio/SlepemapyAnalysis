@@ -32,7 +32,7 @@ class Graph(Drawable):
         :param marker: marker of points on curve
         """
 
-        name = self.get_country_name(data.name[0])+', '+self.get_place_type_name_plural(data.name[1])
+        name = self.get_label(data.name[0], data.name[1])
         return ax.plot(data['session_number'],data['result'],color=colour,marker=marker, label=name)
 
 
@@ -69,6 +69,26 @@ class Graph(Drawable):
         ax.set_ylabel(name, color='red')
         ax.set_yscale('symlog')
         return ax.plot(data['session_number'], log(data['counts']), color = 'red', linestyle='--', label='Count')
+
+
+    def response_time(self, directory=''):
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.average_response_time(self.frame)
+        if not data.empty:
+            fig, ax = plt.subplots()
+            data = data.reset_index()
+            ax.plot(data.session_number, data.incorrect, color = 'red', label='Incorrect')
+            ax.plot(data.session_number, data.correct, color = 'green', label='Correct')
+            ax.set_yscale('symlog')
+
+            self._plot_second_axis(data, ax)
+            ax.set_title(u"Progress of mean response times over sessions")
+            ax.set_xlabel('Session number')
+            ax.set_ylabel('Mean log of response times')
+            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            plt.savefig(directory+'response_time.svg', bbox_inches='tight')
+            plt.close()
 
 
     def skill(self, directory='', plot_individual_graphs = True):
@@ -183,6 +203,28 @@ class Graph(Drawable):
             plt.close()
 
 
+    def number_of_users_over_session(self, directory=''):
+        """Draws graph of number of answers per session.
+
+        :param threshold: how many sessions to plot
+        :param directory: -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.number_of_users(self.frame)
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            ax.bar(range(len(data)),data.values, color="cyan")
+            ax.set_title(u"Number of users over sessions")
+            ax.set_ylabel(u"Number of users")
+            ax.set_xlabel(u"Session number")
+
+            plt.savefig(directory+'number_of_users_over_session.svg', bbox_inches='tight')
+            plt.close()
+
+
 ################################################################################
 
 
@@ -291,7 +333,7 @@ class Graph(Drawable):
             plt.close()
 
 
-    def number_of_users(self, directory ='', frequency = 'M'):
+    def number_of_users_over_time(self, directory ='', frequency = 'M'):
         """Draws graph of number of users over time
 
         :param frequency: describes over what time period to sample, use only 'M'/'W'/'D'!
@@ -315,7 +357,7 @@ class Graph(Drawable):
             ax.set_xticklabels(data.index.date)
             fig.autofmt_xdate()
 
-            plt.savefig(directory+'number_of_users.svg', bbox_inches='tight')
+            plt.savefig(directory+'number_of_users_over_time.svg', bbox_inches='tight')
             plt.close()
 
 
@@ -387,3 +429,28 @@ class Graph(Drawable):
         ax.set_xlabel(u"Estimated prior skill")
         plt.savefig(directory+'prior_skill_histogram.svg', bbox_inches='tight')
         plt.close()
+
+
+    def difficulty_response_time(self, directory=''):
+        """Draws plot of mean response time for correct/incorrect answers over difficulties
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_country.difficulty_response_time(self.frame, self.prior[0])
+
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            ax.plot(data.difficulty, log(data.correct), color='green', label='Correct')
+            ax.plot(data.difficulty, log(data.incorrect), color='red', label='Incorrect')
+            ax.set_yscale('symlog')
+            ax.set_title(u"Mean response times of correct/incorrect answers for different difficulties")
+            ax.set_xlabel(u"Difficulty")
+            ax.set_ylabel(u"Log of mean response time [ms]")
+            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+
+            plt.savefig(directory+'difficulty_response_time.svg', bbox_inches='tight')
+            plt.close()

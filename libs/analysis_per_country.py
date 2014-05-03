@@ -2,7 +2,7 @@
 
 from elo_rating_system import estimate_current_knowledge
 from common import logis
-from pandas import Series
+from pandas import Series, DataFrame
 
 
 def average_knowledge(difficulties):
@@ -41,14 +41,14 @@ def number_of_answers(frame,right=None):
     return answers['place_asked'].value_counts()
 
 
-def response_time(frame, right=None):
+def response_time(frame, right=None, threshold=60000):
     """Returns dataframe of mean response times per country.
 
     :param right: filter only right/wrong/both answers
     :type right: True/False/None -- default is None
     """
 
-    answers = frame[frame.response_time<60000]
+    answers = frame[frame.response_time<threshold]
     if right:
         answers = answers[answers.place_asked==answers.place_answered]
     elif right == False:
@@ -89,4 +89,18 @@ def answer_portions(frame, threshold=None):
     if threshold is None:
         return mistaken
     else:
-        return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))   
+        return (mistaken[mistaken>=threshold]*100).append(Series({0:mistaken[mistaken<threshold].sum()*100}))
+
+
+def difficulty_response_time(frame, difficulty):
+    data = DataFrame(response_time(frame,right=True))
+    data.columns = ['correct']
+    data['incorrect'] = response_time(frame,right=False)
+    d = Series(difficulty)
+    d = d.apply(lambda x: logis(x[0]))
+    d.name = 'difficulty'
+    data = data.join(d)
+    data = data.sort(columns=['difficulty'])
+    data.correct = data.correct.fillna(data.correct.mean())
+    data.incorrect = data.incorrect.fillna(data.incorrect.mean())
+    return data

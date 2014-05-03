@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from colorsys import hsv_to_rgb
-from numpy import timedelta64
+from numpy import timedelta64, uint16
 from math import exp
 from random import shuffle
 
@@ -23,6 +23,12 @@ def logis(value):
     """Logistic function
     """
     return (1.0 / (1 + exp(-value)))
+
+
+def add_place_type(frame, codes):
+    c = codes.type
+    c.name = 'place_type'
+    return frame.join(c, on=['place_asked'], how='right')
 
 
 def add_session_numbers(frame,session_duration=timedelta64(30, 'm')):
