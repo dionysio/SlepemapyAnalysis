@@ -99,8 +99,7 @@ def difficulty_response_time(frame, difficulty):
     d = Series(difficulty)
     d = d.apply(lambda x: logis(x[0]))
     d.name = 'difficulty'
-    data = data.join(d)
+    data = data.join(d)    
+    data = data.dropna()
     data = data.sort(columns=['difficulty'])
-    data.correct = data.correct.fillna(data.correct.mean())
-    data.incorrect = data.incorrect.fillna(data.incorrect.mean())
     return data

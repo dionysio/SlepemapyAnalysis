@@ -404,10 +404,10 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         fig, ax = plt.subplots()
-        items = [item[0] for item in self.prior[0].itervalues()]
+        items = [logis(item[0]) for item in self.prior[0].itervalues()]
         ax.hist(items)
         ax.set_title(u"Histogram of difficulty ")
-        ax.set_ylabel(u"Number of countries")
+        ax.set_ylabel(u"Number of places")
         ax.set_xlabel(u"Estimated difficulty")
         plt.savefig(directory+'difficulty_histogram.svg', bbox_inches='tight')
         plt.close()
