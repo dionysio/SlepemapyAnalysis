@@ -17,6 +17,8 @@ def generate_graphs(g, directory):
     g.number_of_users(directory=directory)
     g.weekday_activity(directory=directory)
     g.hourly_activity(directory=directory)
+    g.average_skill_over_session()
+    g.average_success_over_session()
 
 
 (items, frame, prior, codes, working_directory) = get_arguments(path.dirname(path.realpath(__file__)), False)

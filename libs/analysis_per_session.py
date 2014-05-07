@@ -122,6 +122,11 @@ def average_response_time(frame):
     return result
 
 
+def average_by_session(frame):
+    data = frame.reset_index().groupby('session_number').apply(lambda x: x.mean())
+    return data[['result','counts']]
+
+
 def number_of_users(frame):
     """Returns number of users that got to specific session.
     """

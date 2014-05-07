@@ -76,10 +76,12 @@ def estimate_current_knowledge(frame, difficulties):
 
     prior_skill = estimate_prior_knowledge(frame,difficulties)
     current_skill  = defaultdict(lambda : (prior_skill[0],0))
-    for index,answer in frame.iterrows():
-        update = _elo(answer, 
-            current_skill[answer.place_asked][0], current_skill[answer.place_asked][1],
-            difficulties[answer.place_asked][0], difficulties[answer.place_asked][1])
 
-        current_skill[answer.place_asked] = (update[0], current_skill[answer.place_asked][1]+1)
+    def func(x):
+        current_skill[x.place_asked] = (_elo(x, 
+            current_skill[x.place_asked][0], current_skill[x.place_asked][1],
+            difficulties[x.place_asked][0], difficulties[x.place_asked][1])[0],
+            current_skill[x.place_asked][1]+1)
+
+    frame.apply(func, axis=1)
     return current_skill

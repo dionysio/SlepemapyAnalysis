@@ -9,7 +9,7 @@ from common import colour_range, logis
 from numpy import arange, ceil, log
 import matplotlib.pyplot as plt
 from matplotlib import interactive
-from matplotlib import rc
+from matplotlib import rc, rcParams
 import colorbrewer
 from os import path, makedirs
 
@@ -21,6 +21,7 @@ class Graph(Drawable):
         Drawable.__init__(self, path, df, user, place_asked, prior, codes)
         interactive(False) #disable matplotlib interactivity
         rc('font', **{'sans-serif' : 'Times New Roman','family' : 'sans-serif'})
+        rcParams['svg.fonttype'] = 'none'
 
 
     def _plot_group(self, data, ax, colour, marker):
@@ -123,6 +124,53 @@ class Graph(Drawable):
                 data.apply(lambda x: self._plot_separated_group(x, directory+'skill_separated/','Skill'))
 
 
+    def average_skill_over_session(self, directory=''):
+        """Draws graph of mean skill per session.
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.average_skill(self.frame, self.prior[0], self.codes)
+        data = analysis_per_session.average_by_session(data)
+        data.result = data.result.apply(logis)
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            data = data.reset_index()
+            ax.plot(data.session_number, data.result, color = 'green')
+            ax.set_title(u"Progress of average skill over sessions")
+            ax.set_xlabel('Session number')
+            ax.set_ylabel('Mean skill')
+
+            plt.savefig(directory+'avg_skill_over_session.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def average_success_over_session(self, directory=''):
+        """Draws graph of mean success per session.
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.average_success(self.frame,self.codes)
+        data = analysis_per_session.average_by_session(data)    
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            data = data.reset_index()
+            ax.plot(data.session_number, data.result, color = 'green')
+            ax.set_title(u"Progress of average success rate over sessions")
+            ax.set_xlabel('Session number')
+            ax.set_ylabel('Mean success rate')
+
+            plt.savefig(directory+'avg_success_over_session.svg', bbox_inches='tight')
+            plt.close()
+
+
     def success_over_session(self,directory='', plot_individual_graphs=True):
         """Draws graph of mean success per session.
 
@@ -133,7 +181,6 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         data = analysis_per_session.average_success(self.frame,self.codes)
-
         if not data.empty:
             fig, ax = plt.subplots()
 
@@ -147,12 +194,12 @@ class Graph(Drawable):
             ax.set_ylabel('Mean success rate')
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             plt.savefig(directory+'success_over_session.svg', bbox_inches='tight')
-            
+            plt.close()
+
             if plot_individual_graphs:
                 if not path.exists(directory+'success_separated/'):
                     makedirs(directory+'success_separated/')
                 data.apply(lambda x: self._plot_separated_group(x, directory+'success_separated/','Success'))
-            plt.close()
 
 
     def lengths_of_sessions(self, directory='',threshold=None):

@@ -5,7 +5,7 @@ from common import logis
 from pandas import Series, DataFrame
 
 
-def average_knowledge(difficulties):
+def prior_knowledge(difficulties):
     """Returns predicted probabilities of success for new user.
     """
 
@@ -15,7 +15,7 @@ def average_knowledge(difficulties):
     return Series(result,index=difficulties.keys())
 
 
-def knowledge(frame,difficulties):
+def average_knowledge(frame,difficulties):
     """User-specific predicted probabilities of success.
     """
     
@@ -24,6 +24,20 @@ def knowledge(frame,difficulties):
     for item in skills.iteritems():
         result += [logis(item[1][0] - difficulties[item[0]][0])]
     return Series(result,index=skills.keys())
+
+
+def average_knowledgeNEW(frame,difficulties):
+    """User-specific predicted probabilities of success.
+    """
+    
+    skills = frame.groupby('user').apply(lambda x: DataFrame.from_dict(estimate_current_knowledge(x,difficulties),orient='index'))
+    skills = skills.reset_index()
+    skills = skills.groupby('level_1').apply(lambda x: x[0].mean())
+    skills = skills.reset_index()
+    ind = skills.index
+    skills = skills.apply(lambda x: logis(x[0] - difficulties[x["level_1"]][0]),axis=1)
+    skills.index = ind
+    return skills.dropna()
 
 
 def number_of_answers(frame,right=None):

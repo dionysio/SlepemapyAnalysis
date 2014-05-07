@@ -18,7 +18,7 @@ class Map(Drawable):
         """
 
         if not df.empty:
-            df = df[(df.place_asked>=bounds[0]) & (df.place_answered<=bounds[1])]
+            df = df[(df.place_asked>=bounds[0]) & (df.place_asked<=bounds[1])]
         Drawable.__init__(self,directory,df,user,place_asked,prior,codes)
 
         config ={
@@ -246,7 +246,7 @@ class Map(Drawable):
         self.draw_map(directory+'response_time.svg','Response time',colours)
 
 
-    def average_knowledge(self,directory='',classification_method=None,number_of_bins=6):
+    def prior_knowledge(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of total number of answers per country.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
@@ -256,17 +256,17 @@ class Map(Drawable):
 
         if not directory:
             directory = self.current_directory+'/maps/'
-        data = analysis_per_country.average_knowledge(self.prior[0])[self.bounds[0]:self.bounds[1]] #filter only for world countries
+        data = analysis_per_country.prior_knowledge(self.prior[0])[self.bounds[0]:self.bounds[1]] #filter only for world countries
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,colour_range="RdYlGn")
             self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(directory+'average_knowledge.svg','Average knowledge',colours)
+        self.draw_map(directory+'prior_knowledge.svg','Prior knowledge',colours)
 
 
-    def knowledge(self,directory='',classification_method=None,number_of_bins=6):
+    def average_knowledge(self,directory='',classification_method=None,number_of_bins=6):
         """Draws map of user knowledge.
 
         :param classification_method: which function to use for binning -- default is None (-> jenks_classification)
@@ -276,14 +276,14 @@ class Map(Drawable):
 
         if not directory:
             directory = self.current_directory+'/maps/'
-        data = analysis_per_country.knowledge(self.frame,self.prior[0])
+        data = analysis_per_country.average_knowledge(self.frame,self.prior[0])
         colours = None
 
         if not data.empty:
             (data,colours) = self.bin_data(data,classification_method,number_of_bins,colour_range="RdYlGn")
             self.generate_css(data[['country','rgb']],directory=self.current_directory+'/data/style.css')
 
-        self.draw_map(directory+'knowledge.svg','Knowledge ',colours)
+        self.draw_map(directory+'average_knowledge.svg','Average knowledge ',colours)
 
 
     def success(self,directory='',classification_method=None,number_of_bins=6):
