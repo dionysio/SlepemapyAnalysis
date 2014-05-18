@@ -1,0 +1,7 @@
+maps-user module
+================
+
+.. automodule:: maps-user
+    :members:
+    :undoc-members:
+    :show-inheritance:

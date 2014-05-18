@@ -1,0 +1,1243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libs package &mdash; Slepe mapy analysis tool 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Slepe mapy analysis tool 1.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="libs-package">
+<h1>libs package<a class="headerlink" href="#libs-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-libs.analysis_assorted">
+<span id="libs-analysis-assorted-module"></span><h2>libs.analysis_assorted module<a class="headerlink" href="#module-libs.analysis_assorted" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.analysis_assorted.answer_portions">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">answer_portions</tt><big>(</big><em>frame</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#answer_portions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.answer_portions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns portions of answers for specific country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; limit of values to include as separate slice &#8211; default is None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_assorted.average_over_items">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">average_over_items</tt><big>(</big><em>frame</em>, <em>func</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#average_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.average_over_items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_assorted.current_knowledge_over_items">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">current_knowledge_over_items</tt><big>(</big><em>frame</em>, <em>difficulties</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#current_knowledge_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.current_knowledge_over_items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_assorted.difficulty_response_time">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">difficulty_response_time</tt><big>(</big><em>frame</em>, <em>difficulty</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#difficulty_response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.difficulty_response_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean response time for correct/incorrect answers for countries with different difficulties</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_assorted.response_time_over_items">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">response_time_over_items</tt><big>(</big><em>frame</em>, <em>threshold=60000</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#response_time_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.response_time_over_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean response_time over answers for specific country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; upper threshold for response times</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_assorted.success_over_items">
+<tt class="descclassname">libs.analysis_assorted.</tt><tt class="descname">success_over_items</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_assorted.html#success_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_assorted.success_over_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean success rate over answers for specific country.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.analysis_per_place">
+<span id="libs-analysis-per-place-module"></span><h2>libs.analysis_per_place module<a class="headerlink" href="#module-libs.analysis_per_place" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.analysis_per_place.average_current_knowledge">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">average_current_knowledge</tt><big>(</big><em>frame</em>, <em>difficulties</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#average_current_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.average_current_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predicted probabilities of success.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_place.mistaken_places">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">mistaken_places</tt><big>(</big><em>frame</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#mistaken_places"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.mistaken_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns counts of countries that are most mistaken for this country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; only return top counts &#8211; default is None (which means return all)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_place.number_of_answers">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">number_of_answers</tt><big>(</big><em>frame</em>, <em>right=None</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#number_of_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.number_of_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns numbers of answers per country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>right</strong> (<em>True/False/None &#8211; default is None</em>) &#8211; filter only right/wrong/both answers</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_place.prior_knowledge">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">prior_knowledge</tt><big>(</big><em>difficulties</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#prior_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.prior_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns predicted probabilities of success for avg user.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_place.response_time">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">response_time</tt><big>(</big><em>frame</em>, <em>right=None</em>, <em>threshold=60000</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.response_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dataframe of mean response times per country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>right</strong> (<em>True/False/None &#8211; default is None</em>) &#8211; filter only right/wrong/both answers</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_place.success">
+<tt class="descclassname">libs.analysis_per_place.</tt><tt class="descname">success</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_place.html#success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_place.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean success rate for each country.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.analysis_per_session">
+<span id="libs-analysis-per-session-module"></span><h2>libs.analysis_per_session module<a class="headerlink" href="#module-libs.analysis_per_session" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.analysis_per_session.average_skill">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">average_skill</tt><big>(</big><em>frame, difficulties, codes, threshold=None, grpby=['session_number', 'place_map', 'place_type']</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#average_skill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.average_skill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns progress of mean prior skill over sessions. Multi-user version of skill method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; lower threshold for counts</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.average_success">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">average_success</tt><big>(</big><em>frame, codes, threshold=None, grpby=['session_number', 'place_map', 'place_type']</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#average_success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.average_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns progress of mean success rate over sessions. Multi-user version of success method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; lower threshold for counts</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.lengths_of_sessions">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">lengths_of_sessions</tt><big>(</big><em>frame</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#lengths_of_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.lengths_of_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns length of each session.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.number_of_answers">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">number_of_answers</tt><big>(</big><em>frame</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#number_of_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.number_of_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of answers for each session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>threshold</strong> &#8211; maximum number of sessions to return</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.number_of_users">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">number_of_users</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#number_of_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.number_of_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of users that got to specific session.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.response_time_start_end">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">response_time_start_end</tt><big>(</big><em>frame</em>, <em>response_time_threshold=60000</em>, <em>sample=5</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#response_time_start_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.response_time_start_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.skill">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">skill</tt><big>(</big><em>frame</em>, <em>difficulties</em>, <em>codes</em>, <em>reorder_sessions=False</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#skill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.skill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns progress of prior skill over sessions for one user.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_session.success">
+<tt class="descclassname">libs.analysis_per_session.</tt><tt class="descname">success</tt><big>(</big><em>frame</em>, <em>codes</em>, <em>reorder_sessions=False</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_session.html#success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_session.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns progress of success rate over sessions groupped by &#8216;session_number&#8217;,&#8217;place_map&#8217;,&#8217;place_type&#8217;.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.analysis_per_time">
+<span id="libs-analysis-per-time-module"></span><h2>libs.analysis_per_time module<a class="headerlink" href="#module-libs.analysis_per_time" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.analysis_per_time.hourly_activity">
+<tt class="descclassname">libs.analysis_per_time.</tt><tt class="descname">hourly_activity</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_time.html#hourly_activity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_time.hourly_activity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns counts of answers per hour</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_time.number_of_answers">
+<tt class="descclassname">libs.analysis_per_time.</tt><tt class="descname">number_of_answers</tt><big>(</big><em>frame</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_time.html#number_of_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_time.number_of_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of answers for every time period</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_time.number_of_users">
+<tt class="descclassname">libs.analysis_per_time.</tt><tt class="descname">number_of_users</tt><big>(</big><em>frame</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_time.html#number_of_users"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_time.number_of_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of users for every time period</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_time.success">
+<tt class="descclassname">libs.analysis_per_time.</tt><tt class="descname">success</tt><big>(</big><em>frame</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_time.html#success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_time.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns success rate for every time period</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.analysis_per_time.weekday_activity">
+<tt class="descclassname">libs.analysis_per_time.</tt><tt class="descname">weekday_activity</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/analysis_per_time.html#weekday_activity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.analysis_per_time.weekday_activity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns counts of answers per weekdays (first value is Monday etc)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.classification_methods">
+<span id="libs-classification-methods-module"></span><h2>libs.classification_methods module<a class="headerlink" href="#module-libs.classification_methods" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libs.classification_methods.ClassificationMethod">
+<em class="property">class </em><tt class="descclassname">libs.classification_methods.</tt><tt class="descname">ClassificationMethod</tt><a class="reference internal" href="_modules/libs/classification_methods.html#ClassificationMethod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.ClassificationMethod" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="libs.classification_methods.ClassificationMethod.classify">
+<tt class="descname">classify</tt><big>(</big><em>data</em>, <em>number_of_classes</em><big>)</big><a class="reference internal" href="_modules/libs/classification_methods.html#ClassificationMethod.classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.ClassificationMethod.classify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libs.classification_methods.Equidistant">
+<em class="property">class </em><tt class="descclassname">libs.classification_methods.</tt><tt class="descname">Equidistant</tt><a class="reference internal" href="_modules/libs/classification_methods.html#Equidistant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.Equidistant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.classification_methods.ClassificationMethod" title="libs.classification_methods.ClassificationMethod"><tt class="xref py py-class docutils literal"><span class="pre">libs.classification_methods.ClassificationMethod</span></tt></a></p>
+<dl class="method">
+<dt id="libs.classification_methods.Equidistant.classify">
+<tt class="descname">classify</tt><big>(</big><em>data</em>, <em>number_of_classes=6</em><big>)</big><a class="reference internal" href="_modules/libs/classification_methods.html#Equidistant.classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.Equidistant.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data is divided by equally distant ranges.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; values to bin</li>
+<li><strong>number_of_classes</strong> &#8211; divide values into this many bins</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libs.classification_methods.Jenks">
+<em class="property">class </em><tt class="descclassname">libs.classification_methods.</tt><tt class="descname">Jenks</tt><a class="reference internal" href="_modules/libs/classification_methods.html#Jenks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.Jenks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.classification_methods.ClassificationMethod" title="libs.classification_methods.ClassificationMethod"><tt class="xref py py-class docutils literal"><span class="pre">libs.classification_methods.ClassificationMethod</span></tt></a></p>
+<dl class="method">
+<dt id="libs.classification_methods.Jenks.classify">
+<tt class="descname">classify</tt><big>(</big><em>data</em>, <em>number_of_classes=6</em><big>)</big><a class="reference internal" href="_modules/libs/classification_methods.html#Jenks.classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.Jenks.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>original code comes from 
+<a class="reference external" href="http://danieljlewis.org/2010/06/07/jenks-natural-breaks-algorithm-in-python/">http://danieljlewis.org/2010/06/07/jenks-natural-breaks-algorithm-in-python/</a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libs.classification_methods.NestedMeans">
+<em class="property">class </em><tt class="descclassname">libs.classification_methods.</tt><tt class="descname">NestedMeans</tt><a class="reference internal" href="_modules/libs/classification_methods.html#NestedMeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.NestedMeans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.classification_methods.ClassificationMethod" title="libs.classification_methods.ClassificationMethod"><tt class="xref py py-class docutils literal"><span class="pre">libs.classification_methods.ClassificationMethod</span></tt></a></p>
+<dl class="method">
+<dt id="libs.classification_methods.NestedMeans.classify">
+<tt class="descname">classify</tt><big>(</big><em>data</em>, <em>number_of_classes=4</em><big>)</big><a class="reference internal" href="_modules/libs/classification_methods.html#NestedMeans.classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.classification_methods.NestedMeans.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data is divided by nested-means.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> &#8211; values to bin</li>
+<li><strong>number_of_classes</strong> &#8211; divide values into this many bins, has to be a power of 2</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.common">
+<span id="libs-common-module"></span><h2>libs.common module<a class="headerlink" href="#module-libs.common" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.common.add_item_numbers">
+<tt class="descclassname">libs.common.</tt><tt class="descname">add_item_numbers</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#add_item_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.add_item_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assignes number to each answer.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.common.add_place_type">
+<tt class="descclassname">libs.common.</tt><tt class="descname">add_place_type</tt><big>(</big><em>frame</em>, <em>codes</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#add_place_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.add_place_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.common.add_session_numbers">
+<tt class="descclassname">libs.common.</tt><tt class="descname">add_session_numbers</tt><big>(</big><em>frame</em>, <em>session_duration=numpy.timedelta64(30</em>, <em>'m')</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#add_session_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.add_session_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assignes session number to every answer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>session_duration</strong> &#8211; duration of one session</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.common.colour_range">
+<tt class="descclassname">libs.common.</tt><tt class="descname">colour_range</tt><big>(</big><em>length</em>, <em>hue_limit=1.0</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#colour_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.colour_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates shuffled range of colours.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>length</strong> &#8211; how many colours to generate</li>
+<li><strong>hue_limit</strong> &#8211; limits the hue value &#8211; default is 1.0 (no limit)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.common.defaultdict_factory">
+<tt class="descclassname">libs.common.</tt><tt class="descname">defaultdict_factory</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libs/common.html#defaultdict_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.defaultdict_factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.common.first_questions">
+<tt class="descclassname">libs.common.</tt><tt class="descname">first_questions</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#first_questions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.first_questions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns first questions for every session.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.common.get_session_length">
+<tt class="descclassname">libs.common.</tt><tt class="descname">get_session_length</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#get_session_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.get_session_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates session lengths in seconds.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.common.logis">
+<tt class="descclassname">libs.common.</tt><tt class="descname">logis</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="_modules/libs/common.html#logis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.common.logis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logistic function</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.drawable">
+<span id="libs-drawable-module"></span><h2>libs.drawable module<a class="headerlink" href="#module-libs.drawable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libs.drawable.Drawable">
+<em class="property">class </em><tt class="descclassname">libs.drawable.</tt><tt class="descname">Drawable</tt><big>(</big><em>path</em>, <em>frame</em>, <em>prior</em>, <em>codes</em>, <em>users=</em>, <span class="optional">[</span><span class="optional">]</span><em>places=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="libs.drawable.Drawable.get_country_code">
+<tt class="descname">get_country_code</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_country_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_country_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.get_country_name">
+<tt class="descname">get_country_name</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_country_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_country_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.get_country_record">
+<tt class="descname">get_country_record</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_country_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_country_record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.get_label">
+<tt class="descname">get_label</tt><big>(</big><em>mapa</em>, <em>type</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.get_place_type_name">
+<tt class="descname">get_place_type_name</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_place_type_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_place_type_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.get_place_type_name_plural">
+<tt class="descname">get_place_type_name_plural</tt><big>(</big><em>id</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.get_place_type_name_plural"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.get_place_type_name_plural" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.set_codes">
+<tt class="descname">set_codes</tt><big>(</big><em>codes</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.set_codes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.set_codes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.set_frame">
+<tt class="descname">set_frame</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.set_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.set_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.set_path">
+<tt class="descname">set_path</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.set_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.set_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.drawable.Drawable.set_prior">
+<tt class="descname">set_prior</tt><big>(</big><em>prior</em><big>)</big><a class="reference internal" href="_modules/libs/drawable.html#Drawable.set_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.drawable.Drawable.set_prior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.elo_rating_system">
+<span id="libs-elo-rating-system-module"></span><h2>libs.elo_rating_system module<a class="headerlink" href="#module-libs.elo_rating_system" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.elo_rating_system.calculate_difficulties">
+<tt class="descclassname">libs.elo_rating_system.</tt><tt class="descname">calculate_difficulties</tt><big>(</big><em>frame</em><big>)</big><a class="reference internal" href="_modules/libs/elo_rating_system.html#calculate_difficulties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.elo_rating_system.calculate_difficulties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates difficulty for every country</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.elo_rating_system.estimate_current_knowledge">
+<tt class="descclassname">libs.elo_rating_system.</tt><tt class="descname">estimate_current_knowledge</tt><big>(</big><em>frame</em>, <em>difficulties</em><big>)</big><a class="reference internal" href="_modules/libs/elo_rating_system.html#estimate_current_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.elo_rating_system.estimate_current_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="libs.elo_rating_system.estimate_prior_knowledge">
+<tt class="descclassname">libs.elo_rating_system.</tt><tt class="descname">estimate_prior_knowledge</tt><big>(</big><em>frame</em>, <em>difficulties</em><big>)</big><a class="reference internal" href="_modules/libs/elo_rating_system.html#estimate_prior_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.elo_rating_system.estimate_prior_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates prior_knowledge of one user</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.graph">
+<span id="libs-graph-module"></span><h2>libs.graph module<a class="headerlink" href="#module-libs.graph" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libs.graph.Graph">
+<em class="property">class </em><tt class="descclassname">libs.graph.</tt><tt class="descname">Graph</tt><big>(</big><em>path</em>, <em>frame</em>, <em>prior</em>, <em>codes</em>, <em>users=</em>, <span class="optional">[</span><span class="optional">]</span><em>places=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.drawable.Drawable" title="libs.drawable.Drawable"><tt class="xref py py-class docutils literal"><span class="pre">libs.drawable.Drawable</span></tt></a></p>
+<dl class="method">
+<dt id="libs.graph.Graph.answers_portions">
+<tt class="descname">answers_portions</tt><big>(</big><em>directory=''</em>, <em>threshold=0.01</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.answers_portions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.answers_portions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws pie chart of portions of answers to specific country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>threshold</strong> &#8211; limit of values to include as separate slice</li>
+<li><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.average_skill">
+<tt class="descname">average_skill</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.average_skill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.average_skill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of mean skill per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.average_success">
+<tt class="descname">average_success</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.average_success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.average_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of mean success per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.combined_skill">
+<tt class="descname">combined_skill</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.combined_skill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.combined_skill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws separated skills in one graph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.combined_success">
+<tt class="descname">combined_success</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.combined_success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.combined_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of mean success per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.current_skill_over_items">
+<tt class="descname">current_skill_over_items</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.current_skill_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.current_skill_over_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws plot of current skill rate over questions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.difficulty_histogram">
+<tt class="descname">difficulty_histogram</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.difficulty_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.difficulty_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws histogram of difficulties.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.difficulty_response_time">
+<tt class="descname">difficulty_response_time</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.difficulty_response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.difficulty_response_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws plot of mean response time for correct/incorrect answers over difficulties</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.hourly_activity">
+<tt class="descname">hourly_activity</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.hourly_activity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.hourly_activity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws number of questions asked per hour.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current dir)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.lengths_of_sessions">
+<tt class="descname">lengths_of_sessions</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.lengths_of_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.lengths_of_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of lengths of sessions per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>threshold</strong> &#8211; how many sessions to plot (globally there are 50+ sessions, but most of the people stay for 10+-)</li>
+<li><strong>directory</strong> &#8211; &#8211; default is &#8216;&#8217; (current_directory)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.number_of_answers_over_time">
+<tt class="descname">number_of_answers_over_time</tt><big>(</big><em>directory=''</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.number_of_answers_over_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.number_of_answers_over_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of mean number of answers over time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</li>
+<li><strong>frequency</strong> &#8211; describes over what time period to sample, use only &#8216;M&#8217;/&#8217;W&#8217;/&#8217;D&#8217;!</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.number_of_answers_per_session">
+<tt class="descname">number_of_answers_per_session</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.number_of_answers_per_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.number_of_answers_per_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of number of answers per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>threshold</strong> &#8211; how many sessions to plot</li>
+<li><strong>directory</strong> &#8211; &#8211; default is &#8216;&#8217; (current_directory)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.number_of_users_over_time">
+<tt class="descname">number_of_users_over_time</tt><big>(</big><em>directory=''</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.number_of_users_over_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.number_of_users_over_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of number of users over time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>frequency</strong> &#8211; describes over what time period to sample, use only &#8216;M&#8217;/&#8217;W&#8217;/&#8217;D&#8217;!</li>
+<li><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.number_of_users_per_session">
+<tt class="descname">number_of_users_per_session</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.number_of_users_per_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.number_of_users_per_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of number of answers per session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>threshold</strong> &#8211; how many sessions to plot</li>
+<li><strong>directory</strong> &#8211; &#8211; default is &#8216;&#8217; (current_directory)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.prior_skill_histogram">
+<tt class="descname">prior_skill_histogram</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.prior_skill_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.prior_skill_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of prior skill.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.response_time_over_items">
+<tt class="descname">response_time_over_items</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.response_time_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.response_time_over_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws plot of response time over questions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.response_time_start_end">
+<tt class="descname">response_time_start_end</tt><big>(</big><em>directory=''</em>, <em>number_of_bins=4</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.response_time_start_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.response_time_start_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws histogram of differences between start and the end of sessions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.separated_skill">
+<tt class="descname">separated_skill</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.separated_skill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.separated_skill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws averaged separated skills.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.separated_success">
+<tt class="descname">separated_success</tt><big>(</big><em>directory=''</em>, <em>threshold=None</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.separated_success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.separated_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws averaged separated skills.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.success_over_items">
+<tt class="descname">success_over_items</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.success_over_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.success_over_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws plot of success rate over questions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.success_over_time">
+<tt class="descname">success_over_time</tt><big>(</big><em>directory=''</em>, <em>frequency='M'</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.success_over_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.success_over_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws graph of mean success rate over time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current_directory)</li>
+<li><strong>frequency</strong> &#8211; describes over what time period to sample, use only &#8216;M&#8217;/&#8217;W&#8217;/&#8217;D&#8217;!</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.graph.Graph.weekday_activity">
+<tt class="descname">weekday_activity</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/graph.html#Graph.weekday_activity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.graph.Graph.weekday_activity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws number of questions asked per weekday.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (current dir)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.input_output">
+<span id="libs-input-output-module"></span><h2>libs.input_output module<a class="headerlink" href="#module-libs.input_output" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="libs.input_output.get_arguments">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">get_arguments</tt><big>(</big><em>directory</em>, <em>require_items=True</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#get_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.get_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses arguments from command line (-f for directory and -i for items) and returns them as tuple.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>directory</strong> &#8211; load from this directory as default (if -f is not specified)</li>
+<li><strong>require_items</strong> &#8211; whether to is item argument required</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(items, frame, prior, codes, working_directory)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.input_output.load_ab_csv">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">load_ab_csv</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#load_ab_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.load_ab_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used for importing csv of AB testing. Splits dataframe into N categories based on its ab_value column. 
+Expects same csv as answer, but with two additional columns:
+- &#8216;ab_id&#8217;:uint32
+- &#8216;ab_value&#8217;:object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; load csv from this path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.input_output.load_answer_csv">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">load_answer_csv</tt><big>(</big><em>path</em>, <em>types={'place_answered': &lt;type 'numpy.float16'&gt;</em>, <em>'user': &lt;type 'numpy.uint32'&gt;</em>, <em>'place_map': &lt;type 'numpy.float16'&gt;</em>, <em>'place_asked': &lt;type 'numpy.uint16'&gt;</em>, <em>'ip_address': &lt;type 'object'&gt;</em>, <em>'number_of_options': &lt;type 'numpy.uint8'&gt;</em>, <em>'type': &lt;type 'numpy.uint8'&gt;</em>, <em>'id': &lt;type 'numpy.uint32'&gt;</em>, <em>'response_time': &lt;type 'numpy.uint32'&gt;}</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#load_answer_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.load_answer_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports answer csv into pandas DataFrame</p>
+<p>default dtypes:</p>
+<ul class="simple">
+<li>&#8216;user&#8217;:uint32</li>
+<li>&#8216;id&#8217;:uint32</li>
+<li>&#8216;place_asked&#8217;:uint16</li>
+<li>&#8216;place_answered&#8217;:float16 &#8211; has to be float, because uint does not understand NaN (which place_answered may contain)</li>
+<li>&#8216;type&#8217;:uint8</li>
+<li>&#8216;response_time&#8217;:uint32</li>
+<li>&#8216;number_of_options&#8217;:uint8</li>
+<li>&#8216;place_map&#8217;:float16 &#8211; has to be float, because uint does not understand NaN (which place_map may contain)</li>
+<li>&#8216;ip_address&#8217;:object</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; load csv from this path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.input_output.load_place_csv">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">load_place_csv</tt><big>(</big><em>path</em>, <em>types={'code': &lt;type 'object'&gt;</em>, <em>'type': &lt;type 'numpy.uint8'&gt;</em>, <em>'id': &lt;type 'numpy.uint32'&gt;</em>, <em>'name': &lt;type 'object'&gt;}</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#load_place_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.load_place_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used for importing csv of places</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; load csv from this path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.input_output.load_prior">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">load_prior</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#load_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.load_prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns difficulties and prior_skills of places by loading yaml file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; load yaml from this path</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="libs.input_output.save_prior">
+<tt class="descclassname">libs.input_output.</tt><tt class="descname">save_prior</tt><big>(</big><em>out</em>, <em>path</em><big>)</big><a class="reference internal" href="_modules/libs/input_output.html#save_prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.input_output.save_prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and saves difficulties of countries into json file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>frame</strong> &#8211; calculate from this frame</li>
+<li><strong>path</strong> &#8211; save to this path</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs.map">
+<span id="libs-map-module"></span><h2>libs.map module<a class="headerlink" href="#module-libs.map" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="libs.map.Map">
+<em class="property">class </em><tt class="descclassname">libs.map.</tt><tt class="descname">Map</tt><big>(</big><em>path</em>, <em>frame</em>, <em>prior</em>, <em>codes</em>, <em>config</em>, <em>users=</em>, <span class="optional">[</span><span class="optional">]</span><em>places=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.drawable.Drawable" title="libs.drawable.Drawable"><tt class="xref py py-class docutils literal"><span class="pre">libs.drawable.Drawable</span></tt></a></p>
+<dl class="method">
+<dt id="libs.map.Map.average_current_knowledge">
+<tt class="descname">average_current_knowledge</tt><big>(</big><em>directory=''</em>, <em>classification_method=None</em>, <em>number_of_bins=6</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.average_current_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.average_current_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of user knowledge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.bin_data">
+<tt class="descname">bin_data</tt><big>(</big><em>frame</em>, <em>classification_method</em>, <em>number_of_bins</em>, <em>colour_range</em>, <em>additional_places=None</em>, <em>additional_bins=None</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.bin_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.bin_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines classification methods with colouring, returns binned data with assigned colours</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>frame</strong> &#8211; values to bin (expects Series)</li>
+<li><strong>classification_method</strong> &#8211; which function to use for binning &#8211; default is None (-&gt; jenks_classification)</li>
+<li><strong>number_of_bins</strong> &#8211; how many bins to divide data&#8211; default is 6</li>
+<li><strong>additional_places</strong> &#8211; whether to add additional places AFTER binning &#8211; default is None</li>
+<li><strong>additional_bins</strong> &#8211; whether to add additional labels AFTER calculations &#8211; default is None</li>
+<li><strong>colour_range</strong> &#8211; colorbrewer colour range</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(places, bins) &#8211; places is Series with place_asked IDs and it is used for coloring in places. Bins is Series that is used as legend, it has legend label and color</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="libs.map.Map.draw_legend">
+<em class="property">static </em><tt class="descname">draw_legend</tt><big>(</big><em>legend</em>, <em>svg</em>, <em>xy=('5'</em>, <em>'175')</em>, <em>bin_width=15</em>, <em>font_size='12'</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.draw_legend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.draw_legend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws legend into map.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>legend</strong> &#8211; Series with labels as indices and colors (&#8216;&#8217;rgb(0, 255, 255)&#8217;&#8216;) as values</li>
+<li><strong>x,y</strong> &#8211; starting x,y position of the legend</li>
+<li><strong>bin_width</strong> &#8211; width of each individual bin &#8211; default is 15</li>
+<li><strong>font_size</strong> &#8211; font size of labels &#8211; default is 12</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.draw_map">
+<tt class="descname">draw_map</tt><big>(</big><em>frame</em>, <em>directory</em>, <em>title=''</em>, <em>classification_method=None</em>, <em>number_of_bins=6</em>, <em>colour_range='YlOrRd'</em>, <em>additional_places=None</em>, <em>additional_bins=None</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.draw_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.draw_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>General drawing method through kartograph.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>directory</strong> &#8211; output directory</li>
+<li><strong>title</strong> &#8211; name of map</li>
+<li><strong>classification_method</strong> &#8211; which function to use for binning &#8211; default is None (-&gt; jenks_classification)</li>
+<li><strong>colour_range</strong> &#8211; colorbrewer colour range &#8211; default is &#8220;YlOrRd&#8221;</li>
+<li><strong>number_of_bins</strong> &#8211; how many bins to divide data&#8211; default is 6</li>
+<li><strong>additional_places</strong> &#8211; whether to add additional places AFTER binning &#8211; default is None</li>
+<li><strong>additional_bins</strong> &#8211; whether to add additional labels AFTER calculations &#8211; default is []</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="libs.map.Map.draw_title">
+<em class="property">static </em><tt class="descname">draw_title</tt><big>(</big><em>title</em>, <em>svg</em>, <em>xy=('400'</em>, <em>'410')</em>, <em>font_size='20'</em>, <em>colour='black'</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.draw_title"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.draw_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws title into svg map.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> &#8211; text do input into picture</li>
+<li><strong>x,y</strong> &#8211; starting x,y position of the title &#8211; default is (&#8216;400&#8217;,&#8216;410&#8217;)</li>
+<li><strong>font_size</strong> &#8211; font size of labels &#8211; default is 20</li>
+<li><strong>colour</strong> &#8211; title colour</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="libs.map.Map.generate_css">
+<em class="property">static </em><tt class="descname">generate_css</tt><big>(</big><em>frame</em>, <em>optional_css=''</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.generate_css"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.generate_css" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates css for coloring in places.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>frame</strong> &#8211; Series with place_asked IDs as indices and colours as values</li>
+<li><strong>optional_css</strong> &#8211; append additional css at the end of the calculated css&#8211; default is &#8216;&#8217;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.mistaken_places">
+<tt class="descname">mistaken_places</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.mistaken_places"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.mistaken_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of most mistaken places for one specific places.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.number_of_answers">
+<tt class="descname">number_of_answers</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.number_of_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.number_of_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of total number of answers per country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.prior_knowledge">
+<tt class="descname">prior_knowledge</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.prior_knowledge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.prior_knowledge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of prior knowledge.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.response_time">
+<tt class="descname">response_time</tt><big>(</big><em>directory=''</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.response_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.response_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of mean response time per country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="libs.map.Map.success">
+<tt class="descname">success</tt><big>(</big><em>directory=''</em>, <em>classification_method=None</em>, <em>number_of_bins=6</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#Map.success"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.Map.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws map of mean success rate per country.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>directory</strong> &#8211; output directory &#8211; default is &#8216;&#8217; (./maps/)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libs.map.MapFile">
+<em class="property">class </em><tt class="descclassname">libs.map.</tt><tt class="descname">MapFile</tt><a class="reference internal" href="_modules/libs/map.html#MapFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.MapFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">StringIO.StringIO</span></tt></p>
+<p>Dummy subclass of StringIO used for map drawing. Kartograph closes file after drawing map, which is not good. Other drawing methods (title, legend) would have to open the file with map every time. So instead there is this class, that does not close and is passed along to other drawing methods and closed then.</p>
+<dl class="method">
+<dt id="libs.map.MapFile.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libs/map.html#MapFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.MapFile.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libs.map.MapFile.real_close">
+<tt class="descname">real_close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/libs/map.html#MapFile.real_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.MapFile.real_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does exactly same thing as origial close() method</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="libs.map.WorldMap">
+<em class="property">class </em><tt class="descclassname">libs.map.</tt><tt class="descname">WorldMap</tt><big>(</big><em>path, frame, prior, codes, users=[], places=[51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 234, 235]</em><big>)</big><a class="reference internal" href="_modules/libs/map.html#WorldMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.map.WorldMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#libs.map.Map" title="libs.map.Map"><tt class="xref py py-class docutils literal"><span class="pre">libs.map.Map</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-libs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-libs" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">libs package</a><ul>
+<li><a class="reference internal" href="#module-libs.analysis_assorted">libs.analysis_assorted module</a></li>
+<li><a class="reference internal" href="#module-libs.analysis_per_place">libs.analysis_per_place module</a></li>
+<li><a class="reference internal" href="#module-libs.analysis_per_session">libs.analysis_per_session module</a></li>
+<li><a class="reference internal" href="#module-libs.analysis_per_time">libs.analysis_per_time module</a></li>
+<li><a class="reference internal" href="#module-libs.classification_methods">libs.classification_methods module</a></li>
+<li><a class="reference internal" href="#module-libs.common">libs.common module</a></li>
+<li><a class="reference internal" href="#module-libs.drawable">libs.drawable module</a></li>
+<li><a class="reference internal" href="#module-libs.elo_rating_system">libs.elo_rating_system module</a></li>
+<li><a class="reference internal" href="#module-libs.graph">libs.graph module</a></li>
+<li><a class="reference internal" href="#module-libs.input_output">libs.input_output module</a></li>
+<li><a class="reference internal" href="#module-libs.map">libs.map module</a></li>
+<li><a class="reference internal" href="#module-libs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/libs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

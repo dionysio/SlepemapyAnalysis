@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libs.analysis_per_place &mdash; Slepe mapy analysis tool 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Slepe mapy analysis tool 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libs.analysis_per_place</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">elo_rating_system</span> <span class="kn">import</span> <span class="n">estimate_current_knowledge</span>
+<span class="kn">from</span> <span class="nn">common</span> <span class="kn">import</span> <span class="n">logis</span><span class="p">,</span> <span class="n">first_questions</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+
+
+<div class="viewcode-block" id="prior_knowledge"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.prior_knowledge">[docs]</a><span class="k">def</span> <span class="nf">prior_knowledge</span><span class="p">(</span><span class="n">difficulties</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns predicted probabilities of success for avg user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">logis</span><span class="p">(</span><span class="o">-</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">difficulties</span><span class="o">.</span><span class="n">itervalues</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">difficulties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+</div>
+<div class="viewcode-block" id="average_current_knowledge"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.average_current_knowledge">[docs]</a><span class="k">def</span> <span class="nf">average_current_knowledge</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">difficulties</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predicted probabilities of success.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;user&#39;</span><span class="p">]))</span>
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">skills</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">estimate_current_knowledge</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">difficulties</span><span class="p">),</span><span class="n">orient</span><span class="o">=</span><span class="s">&#39;index&#39;</span><span class="p">))</span>
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">skills</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">skills</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;level_1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">skills</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">skills</span><span class="p">[</span><span class="s">&#39;level_1&#39;</span><span class="p">]</span>
+    <span class="n">skills</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">skills</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">logis</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">difficulties</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&quot;level_1&quot;</span><span class="p">]][</span><span class="mi">0</span><span class="p">]),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">skills</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="k">return</span> <span class="n">skills</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="number_of_answers"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.number_of_answers">[docs]</a><span class="k">def</span> <span class="nf">number_of_answers</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns numbers of answers per country.</span>
+
+<span class="sd">    :param right: filter only right/wrong/both answers</span>
+<span class="sd">    :type right: True/False/None -- default is None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">answers</span> <span class="o">=</span> <span class="n">frame</span>
+    <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">place_asked</span><span class="o">==</span><span class="n">frame</span><span class="o">.</span><span class="n">place_answered</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">right</span><span class="o">==</span><span class="bp">False</span><span class="p">:</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">place_asked</span><span class="o">!=</span><span class="n">frame</span><span class="o">.</span><span class="n">place_answered</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">answers</span><span class="p">[</span><span class="s">&#39;place_asked&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="response_time"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.response_time">[docs]</a><span class="k">def</span> <span class="nf">response_time</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">60000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns dataframe of mean response times per country.</span>
+
+<span class="sd">    :param right: filter only right/wrong/both answers</span>
+<span class="sd">    :type right: True/False/None -- default is None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">answers</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">response_time</span><span class="o">&lt;</span><span class="n">threshold</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">right</span><span class="p">:</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="p">[</span><span class="n">answers</span><span class="o">.</span><span class="n">place_asked</span><span class="o">==</span><span class="n">answers</span><span class="o">.</span><span class="n">place_answered</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">right</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="p">[</span><span class="n">answers</span><span class="o">.</span><span class="n">place_asked</span><span class="o">!=</span><span class="n">answers</span><span class="o">.</span><span class="n">place_answered</span><span class="p">]</span>
+    <span class="n">answers</span> <span class="o">=</span> <span class="n">answers</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;place_asked&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answers</span><span class="p">[</span><span class="s">&#39;response_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="mistaken_places"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.mistaken_places">[docs]</a><span class="k">def</span> <span class="nf">mistaken_places</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns counts of countries that are most mistaken for this country.</span>
+
+<span class="sd">    :param threshold: only return top counts -- default is None (which means return all)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">wrong_answers</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">first_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrong_answers</span><span class="p">)</span>
+    <span class="n">wrong_answers</span> <span class="o">=</span> <span class="n">wrong_answers</span><span class="p">[</span><span class="n">wrong_answers</span><span class="o">.</span><span class="n">place_asked</span><span class="o">!=</span><span class="n">wrong_answers</span><span class="o">.</span><span class="n">place_answered</span><span class="p">]</span>
+    <span class="n">wrong_answers</span> <span class="o">=</span> <span class="n">wrong_answers</span><span class="p">[</span><span class="s">&#39;place_answered&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+    <span class="n">wrong_answers</span> <span class="o">=</span> <span class="n">wrong_answers</span><span class="p">[:</span><span class="n">threshold</span><span class="p">]</span>
+    <span class="n">wrong_answers</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;code&#39;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">wrong_answers</span><span class="p">,</span> <span class="n">first_len</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="success"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_place.success">[docs]</a><span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns mean success rate for each country.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;place_asked&#39;</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">place_asked</span><span class="o">==</span><span class="n">x</span><span class="o">.</span><span class="n">place_answered</span><span class="p">])</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">groups</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+graphs-place module
+===================
+
+.. automodule:: graphs-place
+    :members:
+    :undoc-members:
+    :show-inheritance:

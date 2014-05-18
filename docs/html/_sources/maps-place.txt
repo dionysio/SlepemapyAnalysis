@@ -1,0 +1,7 @@
+maps-place module
+=================
+
+.. automodule:: maps-place
+    :members:
+    :undoc-members:
+    :show-inheritance:

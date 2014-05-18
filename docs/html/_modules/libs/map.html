@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libs.map &mdash; Slepe mapy analysis tool 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Slepe mapy analysis tool 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libs.map</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">drawable</span> <span class="kn">import</span> <span class="n">Drawable</span>
+<span class="kn">import</span> <span class="nn">analysis_per_place</span>
+<span class="kn">from</span> <span class="nn">classification_methods</span> <span class="kn">import</span> <span class="n">Jenks</span>
+
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">cut</span>
+<span class="kn">import</span> <span class="nn">colorbrewer</span>
+<span class="kn">from</span> <span class="nn">kartograph</span> <span class="kn">import</span> <span class="n">Kartograph</span>
+<span class="kn">from</span> <span class="nn">StringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+
+<div class="viewcode-block" id="MapFile"><a class="viewcode-back" href="../../libs.html#libs.map.MapFile">[docs]</a><span class="k">class</span> <span class="nc">MapFile</span><span class="p">(</span><span class="n">StringIO</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Dummy subclass of StringIO used for map drawing. Kartograph closes file after drawing map, which is not good. Other drawing methods (title, legend) would have to open the file with map every time. So instead there is this class, that does not close and is passed along to other drawing methods and closed then.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">StringIO</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="MapFile.close"><a class="viewcode-back" href="../../libs.html#libs.map.MapFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="MapFile.real_close"><a class="viewcode-back" href="../../libs.html#libs.map.MapFile.real_close">[docs]</a>    <span class="k">def</span> <span class="nf">real_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Does exactly same thing as origial close() method</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">buf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span>
+
+</div></div>
+<div class="viewcode-block" id="Map"><a class="viewcode-back" href="../../libs.html#libs.map.Map">[docs]</a><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">Drawable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="p">[],</span> <span class="n">places</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Draws world map by default. All other defaults are same as in Drawable.</span>
+<span class="sd">        </span>
+<span class="sd">        :param config: configuration of kartograph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Drawable</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">users</span><span class="p">,</span> <span class="n">places</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">=</span> <span class="n">Kartograph</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Map.draw_map"><a class="viewcode-back" href="../../libs.html#libs.map.Map.draw_map">[docs]</a>    <span class="k">def</span> <span class="nf">draw_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">classification_method</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">number_of_bins</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> 
+                <span class="n">colour_range</span> <span class="o">=</span> <span class="s">&quot;YlOrRd&quot;</span><span class="p">,</span> <span class="n">additional_places</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">additional_bins</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;General drawing method through kartograph.</span>
+
+<span class="sd">        :param directory: output directory</span>
+<span class="sd">        :param title: name of map</span>
+<span class="sd">        :param classification_method: which function to use for binning -- default is None (-&gt; jenks_classification)</span>
+<span class="sd">        :param colour_range: colorbrewer colour range -- default is &quot;YlOrRd&quot;</span>
+<span class="sd">        :param number_of_bins: how many bins to divide data-- default is 6</span>
+<span class="sd">        :param additional_places: whether to add additional places AFTER binning -- default is None</span>
+<span class="sd">        :param additional_bins: whether to add additional labels AFTER calculations -- default is []</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="k">if</span> <span class="n">classification_method</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">classification_method</span> <span class="o">=</span> <span class="n">Jenks</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">places</span><span class="p">,</span> <span class="n">legend</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_data</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">classification_method</span><span class="p">,</span> <span class="n">number_of_bins</span><span class="p">,</span> <span class="n">colour_range</span><span class="p">,</span> <span class="n">additional_places</span><span class="p">,</span> <span class="n">additional_bins</span><span class="p">)</span>
+
+        <span class="n">svg</span> <span class="o">=</span> <span class="n">MapFile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">outfile</span><span class="o">=</span><span class="n">svg</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;svg&#39;</span><span class="p">,</span> <span class="n">stylesheet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_css</span><span class="p">(</span><span class="n">places</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">legend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_legend</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="n">svg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">svg</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">svg</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf8&#39;</span><span class="p">))</span>
+        <span class="n">svg</span><span class="o">.</span><span class="n">real_close</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="Map.bin_data"><a class="viewcode-back" href="../../libs.html#libs.map.Map.bin_data">[docs]</a>    <span class="k">def</span> <span class="nf">bin_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">classification_method</span><span class="p">,</span> <span class="n">number_of_bins</span><span class="p">,</span> <span class="n">colour_range</span><span class="p">,</span>
+            <span class="n">additional_places</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">additional_bins</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Combines classification methods with colouring, returns binned data with assigned colours</span>
+
+<span class="sd">        :param frame: values to bin (expects Series)</span>
+<span class="sd">        :param classification_method: which function to use for binning -- default is None (-&gt; jenks_classification)</span>
+<span class="sd">        :param number_of_bins: how many bins to divide data-- default is 6</span>
+<span class="sd">        :param additional_places: whether to add additional places AFTER binning -- default is None</span>
+<span class="sd">        :param additional_bins: whether to add additional labels AFTER calculations -- default is None</span>
+<span class="sd">        :param colour_range: colorbrewer colour range</span>
+
+<span class="sd">        :returns:  (places, bins) -- places is Series with place_asked IDs and it is used for coloring in places. Bins is Series that is used as legend, it has legend label and color</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">classification_method</span><span class="o">.</span><span class="n">classify</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span><span class="n">number_of_bins</span><span class="p">)</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">bins</span><span class="p">))</span> <span class="c">#drop duplicate bins</span>
+        <span class="n">bins</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">colour_range</span> <span class="o">==</span> <span class="s">&#39;RdYlGn&#39;</span><span class="p">:</span>
+            <span class="n">colours</span> <span class="o">=</span> <span class="n">colorbrewer</span><span class="o">.</span><span class="n">RdYlGn</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c">#Red, Yellow, Green</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">colours</span> <span class="o">=</span> <span class="n">colorbrewer</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c">#Yellow, Orange, Red</span>
+        <span class="n">colours</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">rgb(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;)</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">colours</span><span class="p">]</span>
+
+        <span class="n">places</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">cut</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span> <span class="bp">True</span><span class="p">),</span><span class="n">index</span><span class="o">=</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;colour&#39;</span><span class="p">)</span>
+        <span class="n">places</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="p">[[</span><span class="s">&#39;code&#39;</span><span class="p">,</span><span class="s">&#39;id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">places</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">places</span> <span class="o">=</span> <span class="n">places</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">&#39;code&#39;</span><span class="p">)[</span><span class="s">&#39;colour&#39;</span><span class="p">]</span>
+        <span class="n">places</span> <span class="o">=</span> <span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">additional_places</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">places</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;colour&#39;</span>
+
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">colours</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">cut</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span> <span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">levels</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;colour&#39;</span><span class="p">)</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Series</span><span class="p">([</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">rgb(255, 255, 255)</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">],[</span><span class="s">&#39;No data&#39;</span><span class="p">]))</span> <span class="c">#white for No data bin</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">bins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">additional_bins</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">places</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Map.generate_css"><a class="viewcode-back" href="../../libs.html#libs.map.Map.generate_css">[docs]</a>    <span class="k">def</span> <span class="nf">generate_css</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">optional_css</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates css for coloring in places.</span>
+
+<span class="sd">        :param frame: Series with place_asked IDs as indices and colours as values</span>
+<span class="sd">        :param optional_css: append additional css at the end of the calculated css-- default is &#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">,</span><span class="s">&#39;colour&#39;</span><span class="p">]</span>
+        <span class="n">css</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
+        <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">css</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;.states[iso_a2=&#39;</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="o">+</span><span class="s">&#39;{</span><span class="se">\n\t</span><span class="s">fill: &#39;</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;colour&#39;</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;;</span><span class="se">\n</span><span class="s">}</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">assign</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">optional_css</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">optional_css</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">optional</span><span class="p">:</span>
+                <span class="n">css</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">optional</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">css</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Map.draw_legend"><a class="viewcode-back" href="../../libs.html#libs.map.Map.draw_legend">[docs]</a>    <span class="k">def</span> <span class="nf">draw_legend</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="n">svg</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;5&#39;</span><span class="p">,</span><span class="s">&#39;175&#39;</span><span class="p">),</span> <span class="n">bin_width</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="s">&#39;12&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws legend into map. </span>
+
+<span class="sd">        :param legend: Series with labels as indices and colors (&#39;\&#39;rgb(0, 255, 255)\&#39;&#39;) as values</span>
+<span class="sd">        :param x,y: starting x,y position of the legend</span>
+<span class="sd">        :param bin_width: width of each individual bin -- default is 15</span>
+<span class="sd">        :param font_size: font size of labels -- default is 12</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">svg</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c">#skip to the position right before &lt;/svg&gt; tag</span>
+        <span class="n">svg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&lt;g transform = </span><span class="se">\&quot;</span><span class="s">translate(&#39;</span><span class="o">+</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;)</span><span class="se">\&quot;</span><span class="s">&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="c">#group</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">legend</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">i</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c">#really ugly hack to get around UnboundLocalError inside of _draw_bin</span>
+
+        <span class="k">def</span> <span class="nf">_draw_bin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>  <span class="s">&#39;&lt;rect x=</span><span class="se">\&quot;</span><span class="s">0</span><span class="se">\&quot;</span><span class="s"> y=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">bin_width</span><span class="p">)</span><span class="o">+</span>
+                        <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> width=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">bin_width</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> height=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">bin_width</span><span class="p">)</span><span class="o">+</span>
+                        <span class="s">&#39;&quot; fill=&#39;</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span> <span class="s">&#39;/&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>  <span class="s">&#39;&lt;text x=</span><span class="se">\&quot;</span><span class="s">20</span><span class="se">\&quot;</span><span class="s"> y=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">((</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">bin_width</span><span class="o">+</span><span class="mi">11</span><span class="p">)</span><span class="o">+</span>
+                        <span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> stroke=</span><span class="se">\&quot;</span><span class="s">none</span><span class="se">\&quot;</span><span class="s"> fill=</span><span class="se">\&quot;</span><span class="s">black</span><span class="se">\&quot;</span><span class="s"> font-size=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="n">font_size</span><span class="o">+</span>
+                        <span class="s">&#39;&quot; font-family=</span><span class="se">\&quot;</span><span class="s">sans-serif</span><span class="se">\&quot;</span><span class="s">&gt;&#39;</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;index&#39;</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;&lt;/text&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+=</span><span class="mi">1</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_draw_bin</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">svg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;&lt;/g&gt;</span><span class="se">\n</span><span class="s">&lt;/svg&gt;&#39;</span><span class="p">)</span> <span class="c">#group</span>
+
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Map.draw_title"><a class="viewcode-back" href="../../libs.html#libs.map.Map.draw_title">[docs]</a>    <span class="k">def</span> <span class="nf">draw_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">svg</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;400&#39;</span><span class="p">,</span><span class="s">&#39;410&#39;</span><span class="p">),</span><span class="n">font_size</span><span class="o">=</span><span class="s">&#39;20&#39;</span><span class="p">,</span><span class="n">colour</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws title into svg map.</span>
+
+<span class="sd">        :param title: text do input into picture</span>
+<span class="sd">        :param x,y: starting x,y position of the title -- default is (&#39;400&#39;,&#39;410&#39;)</span>
+<span class="sd">        :param font_size: font size of labels -- default is 20</span>
+<span class="sd">        :param colour: title colour</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">svg</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">svg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>  <span class="s">&#39;</span><span class="se">\n</span><span class="s">&lt;text x =</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> y=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> stroke=</span><span class="se">\&quot;</span><span class="s">none</span><span class="se">\&quot;</span><span class="s"> font-size=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span>
+                    <span class="n">font_size</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> fill=</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="o">+</span><span class="n">colour</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&quot;</span><span class="s"> font-family=</span><span class="se">\&quot;</span><span class="s">sans-serif</span><span class="se">\&quot;</span><span class="s">&gt;&#39;</span><span class="o">+</span>
+                    <span class="n">title</span><span class="o">+</span><span class="s">&#39;&lt;/text&gt;</span><span class="se">\n</span><span class="s">&lt;/svg&gt;&#39;</span><span class="p">)</span>
+
+
+    <span class="c">############################################################################</span>
+
+</div>
+<div class="viewcode-block" id="Map.mistaken_places"><a class="viewcode-back" href="../../libs.html#libs.map.Map.mistaken_places">[docs]</a>    <span class="k">def</span> <span class="nf">mistaken_places</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Draws map of most mistaken places for one specific places.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">mistaken_places</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;mistaken_places.svg&#39;</span><span class="p">,</span> 
+            <span class="s">&#39;Places mistaken for &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">get_country_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s">&#39; out of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s">&#39; answers&#39;</span><span class="p">,</span>
+            <span class="n">additional_places</span><span class="o">=</span><span class="n">Series</span><span class="p">([</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">rgb(0, 255, 255)</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">],[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_country_code</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="mi">0</span><span class="p">])]),</span> 
+            <span class="n">additional_bins</span><span class="o">=</span><span class="n">Series</span><span class="p">([</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">rgb(0, 255, 255)</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">],[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_country_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="mi">0</span><span class="p">])]))</span>
+
+</div>
+<div class="viewcode-block" id="Map.number_of_answers"><a class="viewcode-back" href="../../libs.html#libs.map.Map.number_of_answers">[docs]</a>    <span class="k">def</span> <span class="nf">number_of_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws map of total number of answers per country.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">number_of_answers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;number_of_answers.svg&#39;</span><span class="p">,</span><span class="s">&#39;Number of answers&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Map.response_time"><a class="viewcode-back" href="../../libs.html#libs.map.Map.response_time">[docs]</a>    <span class="k">def</span> <span class="nf">response_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws map of mean response time per country.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">response_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;response_time.svg&#39;</span><span class="p">,</span><span class="s">&#39;Response time&#39;</span><span class="p">)</span>
+        
+
+</div>
+<div class="viewcode-block" id="Map.prior_knowledge"><a class="viewcode-back" href="../../libs.html#libs.map.Map.prior_knowledge">[docs]</a>    <span class="k">def</span> <span class="nf">prior_knowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws map of prior knowledge.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">j</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">places</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">prior_knowledge</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;prior_knowledge.svg&#39;</span><span class="p">,</span><span class="s">&#39;Average prior knowledge&#39;</span><span class="p">,</span><span class="n">colour_range</span><span class="o">=</span><span class="s">&quot;RdYlGn&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Map.average_current_knowledge"><a class="viewcode-back" href="../../libs.html#libs.map.Map.average_current_knowledge">[docs]</a>    <span class="k">def</span> <span class="nf">average_current_knowledge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">classification_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">number_of_bins</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws map of user knowledge.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">average_current_knowledge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;average_current_knowledge.svg&#39;</span><span class="p">,</span><span class="s">&#39;Average current knowledge &#39;</span><span class="p">,</span><span class="n">colour_range</span><span class="o">=</span><span class="s">&quot;RdYlGn&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Map.success"><a class="viewcode-back" href="../../libs.html#libs.map.Map.success">[docs]</a>    <span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">directory</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">classification_method</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">number_of_bins</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws map of mean success rate per country.</span>
+
+<span class="sd">        :param directory: output directory -- default is &#39;&#39; (./maps/)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">directory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_directory</span><span class="o">+</span><span class="s">&#39;/maps/&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">analysis_per_place</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">draw_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">directory</span><span class="o">+</span><span class="s">&#39;success.svg&#39;</span><span class="p">,</span><span class="s">&#39;Success rate&#39;</span><span class="p">,</span><span class="n">colour_range</span><span class="o">=</span><span class="s">&quot;RdYlGn&quot;</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="WorldMap"><a class="viewcode-back" href="../../libs.html#libs.map.WorldMap">[docs]</a><span class="k">class</span> <span class="nc">WorldMap</span><span class="p">(</span><span class="n">Map</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="p">[],</span> <span class="n">places</span><span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">51</span><span class="p">,</span><span class="mi">225</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="mi">234</span><span class="p">,</span><span class="mi">235</span><span class="p">]):</span>
+        <span class="n">config</span> <span class="o">=</span><span class="p">{</span>
+            <span class="s">&quot;layers&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&quot;states&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&quot;src&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">+</span><span class="s">&quot;/data/ne_110m_admin_1_countries/ne_110m_admin_0_countries.shp&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;filter&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;continent&quot;</span><span class="p">,</span> <span class="s">&quot;in&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;Europe&quot;</span><span class="p">,</span><span class="s">&quot;Asia&quot;</span><span class="p">,</span><span class="s">&quot;Africa&quot;</span><span class="p">,</span><span class="s">&quot;South America&quot;</span><span class="p">,</span><span class="s">&quot;Oceania&quot;</span><span class="p">,</span><span class="s">&quot;North America&quot;</span><span class="p">]],</span>
+                    <span class="s">&quot;class&quot;</span><span class="p">:</span> <span class="s">&quot;states&quot;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">Map</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">users</span><span class="p">,</span> <span class="n">places</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+graphs-ab module
+================
+
+.. automodule:: graphs-ab
+    :members:
+    :undoc-members:
+    :show-inheritance:

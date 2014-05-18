@@ -1,0 +1,7 @@
+graphs-global module
+====================
+
+.. automodule:: graphs-global
+    :members:
+    :undoc-members:
+    :show-inheritance:

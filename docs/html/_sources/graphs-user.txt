@@ -1,0 +1,7 @@
+graphs-user module
+==================
+
+.. automodule:: graphs-user
+    :members:
+    :undoc-members:
+    :show-inheritance:

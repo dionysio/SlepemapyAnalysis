@@ -1,0 +1,7 @@
+maps-global module
+==================
+
+.. automodule:: maps-global
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>libs.analysis_per_session &mdash; Slepe mapy analysis tool 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Slepe mapy analysis tool 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for libs.analysis_per_session</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">common</span> <span class="kn">import</span> <span class="n">first_questions</span><span class="p">,</span> <span class="n">get_session_length</span><span class="p">,</span> <span class="n">add_place_type</span><span class="p">,</span> <span class="n">add_session_numbers</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">concat</span><span class="p">,</span> <span class="n">unique</span>
+<span class="kn">from</span> <span class="nn">elo_rating_system</span> <span class="kn">import</span> <span class="n">estimate_prior_knowledge</span>
+
+
+<div class="viewcode-block" id="lengths_of_sessions"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.lengths_of_sessions">[docs]</a><span class="k">def</span> <span class="nf">lengths_of_sessions</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">threshold</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns length of each session.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">get_session_length</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_session_length</span><span class="p">)</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span> <span class="n">groups</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">inserted</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span> <span class="p">(</span><span class="n">groups</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">inserted</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))))</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">threshold</span><span class="p">)],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">groups</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">groups</span>
+
+</div>
+<div class="viewcode-block" id="number_of_answers"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.number_of_answers">[docs]</a><span class="k">def</span> <span class="nf">number_of_answers</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="n">threshold</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns number of answers for each session.</span>
+
+<span class="sd">    :param threshold: maximum number of sessions to return</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">])</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span><span class="n">groups</span><span class="o">.</span><span class="n">sum</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span><span class="n">groups</span><span class="o">.</span><span class="n">sum</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">groups</span><span class="o">.</span><span class="n">session_number</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">threshold</span><span class="p">)],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">groups</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">groups</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_success</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Returns success rate of one specific user for every session (only first questions in session count).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">))</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">)</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">place_asked</span><span class="o">==</span><span class="n">x</span><span class="o">.</span><span class="n">place_answered</span><span class="p">])</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">place_asked</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">first</span>
+
+
+<div class="viewcode-block" id="success"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.success">[docs]</a><span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">reorder_sessions</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns progress of success rate over sessions groupped by &#39;session_number&#39;,&#39;place_map&#39;,&#39;place_type&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">frame</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">place_map</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">place_map</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">225</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">add_place_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">codes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reorder_sessions</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">add_session_numbers</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">])</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_success</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span><span class="n">r</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+</div>
+<div class="viewcode-block" id="skill"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.skill">[docs]</a><span class="k">def</span> <span class="nf">skill</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">difficulties</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">reorder_sessions</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns progress of prior skill over sessions for one user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">frame</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">place_map</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">place_map</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">225</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">add_place_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">codes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">reorder_sessions</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">add_session_numbers</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">estimate_prior_knowledge</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">difficulties</span><span class="p">)[</span><span class="mi">0</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+</div>
+<div class="viewcode-block" id="average_success"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.average_success">[docs]</a><span class="k">def</span> <span class="nf">average_success</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">grpby</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Returns progress of mean success rate over sessions. Multi-user version of success method</span>
+<span class="sd">    </span>
+<span class="sd">    :param threshold: lower threshold for counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">success</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">grpby</span><span class="o">==</span><span class="p">[</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">grpby</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">mean</span><span class="p">())],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">counts</span><span class="o">&gt;</span><span class="n">threshold</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="average_skill"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.average_skill">[docs]</a><span class="k">def</span> <span class="nf">average_skill</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">difficulties</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">grpby</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;session_number&#39;</span><span class="p">,</span><span class="s">&#39;place_map&#39;</span><span class="p">,</span><span class="s">&#39;place_type&#39;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Returns progress of mean prior skill over sessions. Multi-user version of skill method</span>
+<span class="sd">    </span>
+<span class="sd">    :param threshold: lower threshold for counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">first_questions</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">skill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">difficulties</span><span class="p">,</span> <span class="n">codes</span><span class="p">,</span> <span class="n">grpby</span><span class="o">==</span><span class="p">[</span><span class="s">&#39;session_number&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">grpby</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">mean</span><span class="p">())],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;counts&#39;</span><span class="p">,</span><span class="s">&#39;result&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">counts</span><span class="o">&gt;</span><span class="n">threshold</span><span class="p">]</span>
+
+</div>
+<span class="sd">&#39;&#39;&#39;def average(frame, func, threshold=None, grpby=[&#39;session_number&#39;,&#39;place_map&#39;,&#39;place_type&#39;]):</span>
+<span class="sd">    &quot;&quot;&quot;General function to return averaged values of skill/success/response time...</span>
+<span class="sd">    </span>
+<span class="sd">    :param threshold: lower threshold for counts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    data = frame.groupby(&#39;user&#39;)</span>
+<span class="sd">    data = data.apply(func)</span>
+<span class="sd">    data = data.reset_index()</span>
+<span class="sd">    data = data.groupby(grpby)</span>
+<span class="sd">    data = concat([data.apply(len), data.apply(lambda x: x.result.mean())],axis=1)</span>
+<span class="sd">    data.columns = [&#39;counts&#39;,&#39;result&#39;]</span>
+<span class="sd">    return data[data.counts&gt;threshold]&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="number_of_users"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.number_of_users">[docs]</a><span class="k">def</span> <span class="nf">number_of_users</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns number of users that got to specific session.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">user</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="response_time_start_end"><a class="viewcode-back" href="../../libs.html#libs.analysis_per_session.response_time_start_end">[docs]</a><span class="k">def</span> <span class="nf">response_time_start_end</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">response_time_threshold</span><span class="o">=</span><span class="mi">60000</span><span class="p">,</span> <span class="n">sample</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">response_time</span><span class="o">&lt;</span><span class="n">response_time_threshold</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s">&#39;user&#39;</span><span class="p">,</span><span class="s">&#39;session_number&#39;</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:</span><span class="n">sample</span><span class="p">]</span><span class="o">.</span><span class="n">response_time</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="n">sample</span><span class="p">:]</span><span class="o">.</span><span class="n">response_time</span><span class="o">.</span><span class="n">mean</span><span class="p">())],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;session_number&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">-</span><span class="n">data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Slepe mapy analysis tool 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Dionyz Lazar.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
