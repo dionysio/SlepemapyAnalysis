@@ -3,32 +3,30 @@
 from common import add_session_numbers
 
 class Drawable():
+    def __init__(self,path, frame, prior, codes, users=[], places=[]):
+        """Drawable object should have assigned path, codes and DataFrame. 
 
-    """Drawable object should have assigned path, codes and DataFrame. Can be created empty and then assigned by setters.
-
-    :param path: default output directory
-    :param df: dataframe to save -- default None
-    :param user: filter by user id -- default None
-    :param place_asked: filter by place_asked -- default None
-    """
-
-    def __init__(self,path='', df=None, user=None, place_asked=None, prior=None, codes=None):
+        :param path: default output directory
+        :param frame: dataframe to save
+        :param prior: prior knowledge dict
+        :param codes: dataframe with geography.place info
+        :param users: filter by list of user IDs -- default [] -- no filter
+        :param places: filter by place_asked IDs-- default [] -- no filter
+        """
         self.current_directory = path
         self.prior = prior
-        self.frame = None
-        self.place_asked = place_asked
+        self.frame = frame
         self.codes = codes
+        self.users = users
+        self.places = places
 
-        if df is not None:
-            self.frame = df
-            if user is not None:
-                self.frame = self.frame[self.frame.user==user]
-            if place_asked is not None:
-                self.frame = self.frame[self.frame.place_asked==place_asked]
+        if users:
+            self.frame = self.frame[self.frame.user.isin(users)]
+        if places:
+            self.frame = self.frame[self.frame.place_asked.isin(places)]
 
-            #adding new values to frame
-            self.frame = self.frame.groupby('user').apply(add_session_numbers)
-            self.frame.sort()
+        self.frame = self.frame.groupby('user').apply(add_session_numbers)
+        self.frame.sort()
 
 
     def set_frame(self,frame):

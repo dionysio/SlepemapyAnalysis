@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from colorsys import hsv_to_rgb
-from numpy import timedelta64, uint16
+from numpy import timedelta64
 from math import exp
 from random import shuffle
 
@@ -40,6 +40,14 @@ def add_session_numbers(frame,session_duration=timedelta64(30, 'm')):
     result = frame.sort(['inserted'])
     result['session_number'] = (result['inserted'] - result['inserted'].shift(1) > session_duration).fillna(1).cumsum() #adds session numbers to every row
     return result
+
+
+def add_item_numbers(frame):
+    """Assignes number to each answer.
+    """
+    data = frame
+    data['item_number'] = range(len(data))
+    return data
 
 
 def defaultdict_factory():

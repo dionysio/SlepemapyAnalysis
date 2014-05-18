@@ -1,6 +1,6 @@
 from numpy import log2
 from sys import maxint
-
+from sys import float_info
 
 class ClassificationMethod():
     def __init__(self):
@@ -10,15 +10,14 @@ class ClassificationMethod():
         pass
 
 class NestedMeans(ClassificationMethod):
-    def _classify(self, data,num):
+    def _classify(self, data, num):
         """recursive helper function of nested-means
         """
     
         if num<=0 or data.empty:
             return []
-        breaks = [data.mean()]+self._classify(data[data<mean],num-1)+self._classify(data[data>=mean],num-1)
-        breaks = list(set(breaks)) #drop duplicate bins
-        breaks.sort()
+        mean = sum(data)/len(data)
+        breaks = [mean]+self._classify(data[data<mean],num-1)+self._classify(data[data>=mean],num-1)
         return breaks
     
     
@@ -30,84 +29,86 @@ class NestedMeans(ClassificationMethod):
         """
     
         if len(data)<number_of_classes:
-            return [data.min()-1,data.max()+1]
-        breaks = [data.min()-1,data.max()+1]+self._classify(data,log2(number_of_classes))
-        breaks = list(set(breaks)) #drop duplicate bins
-        breaks.sort()
+            return [min(data),max(data)]
+        breaks = [min(data),max(data)]+self._classify(data,log2(number_of_classes))
         return breaks
 
 
 class Equidistant(ClassificationMethod):
-    def classify(self, data,number_of_classes=6):
+    def classify(self, data, number_of_classes=6):
         """Data is divided by equally distant ranges.
     
         :param data: values to bin
         :param number_of_classes: divide values into this many bins
         """
     
-        x = (data.max() - data.min())/number_of_classes
-        breaks = [data.min()-1,data.max()+1]+[i*x for i in range(1,number_of_classes)]
-        breaks = list(set(breaks)) #drop duplicate bins
-        breaks.sort()
+        x = (max(data) - min(data))/number_of_classes
+        breaks = [min(data),max(data)]+[i*x for i in range(1,number_of_classes)]
         return breaks
 
 
 class Jenks(ClassificationMethod):
     def classify(self, data, number_of_classes=6):
-        """Port of original javascript implementation by Tom MacWright from https://gist.github.com/tmcw/4977508
-    
-        Data is divided by jenks algorithm.
-    
-        :param data: values to bin
-        :param number_of_classes: divide values into this many bins
-        """
-    
-        input = data.copy()
-        input.sort()
-        input = input.tolist()
-        length = len(data)
-    
-        #define initial values of the LC and OP
-        lower_class_limits = [[1 for x in range(0,number_of_classes+1)] if y==0 else [0 for x in range(0,number_of_classes+1)] for y in range(0,length+1)] #LC
-        variance_combinations = [[0 for x in range(0,number_of_classes+1)] if y==0 else [maxint for x in range(0,number_of_classes+1)] for y in range(0,length+1)] #OP
-        variance = 0
-    
-        #calculate optimal LC
-        for i in range(1,length):
-            sum = 0 #SZ
-            sum_squares = 0 #ZSQ
-            counter = 0 #WT
-    
-            for j in range(0,i+1):
-                i3 = i - j + 1 #III
-                value = input[i3-1]
-                counter+=1 #WT
-    
-                sum += value
-                sum_squares += value * value
-                variance = sum_squares - (sum * sum) / counter
-                i4 = i3 - 1 #IV
-    
-                if (i4 != 0) :
-                    for k in range(0,number_of_classes+1):
-                        #deciding whether an addition of this element will increase the class variance beyond the limit
-                        #if it does, break the class
-                        if (variance_combinations[i][k] >= (variance + variance_combinations[i4][k - 1])) :
-                            lower_class_limits[i][k] = i3
-                            variance_combinations[i][k] = variance + variance_combinations[i4][k - 1]
-            lower_class_limits[i][1] = 1
-            variance_combinations[i][1] = variance #we can use variance_combinations in calculations of goodness-of-fit, but we do not need it right now
-    
-        #create breaks
-        length -= 1
-        breaks = []
-        breaks.append(input[0]-1) #append lower bound that was not found during calculations
-        breaks.append(input[length]+1) #append upper bound that was not found during calculations
-        while (number_of_classes > 1):
-            breaks.append(input[lower_class_limits[length][number_of_classes] - 2])
-            length = lower_class_limits[length][number_of_classes] -1
-            number_of_classes-=1
-    
-        breaks = list(set(breaks)) #drop duplicate bins
-        breaks.sort()
+        '''original code comes from 
+        http://danieljlewis.org/2010/06/07/jenks-natural-breaks-algorithm-in-python/
+        '''
+
+        data.sort()
+
+        #unreadable one liners
+        #mat1 = [[0 for j in range(number_of_classes+1)] for i in range(len(data))] 
+        #mat1.insert(1,[0]+([1 for i in range(number_of_classes)]))
+        #mat2 = [[0 for j in range(number_of_classes+1)]]+[[0 for j in range(number_of_classes+1)]]+[[0]+[float('inf') for i in range(number_of_classes)] for j in range(len(data)-1)]
+
+        
+        mat1 = []
+        mat2 = [] 
+        for i in xrange(0,len(data)+1): 
+            temp1 = []
+            temp2 = [] 
+            for j in xrange(0,number_of_classes+1): 
+                temp1.append(0) 
+                temp2.append(0)
+            mat1.append(temp1) 
+            mat2.append(temp2)
+
+        for i in xrange(1,number_of_classes+1): 
+            mat1[1][i] = 1 
+            mat2[1][i] = 0 
+            for j in xrange(2,len(data)+1): 
+                mat2[j][i] = float('inf') 
+
+        v = 0.0 
+        for l in xrange(2,len(data)+1): 
+            s1 = 0.0 
+            s2 = 0.0 
+            w = 0.0 
+            for m in xrange(1,l+1): 
+                i3 = l - m + 1 
+
+                val = float(data[i3-1]) 
+
+                s2 += val * val 
+                s1 += val 
+
+                w += 1 
+                v = s2 - (s1 * s1) / w 
+                i4 = i3 - 1 
+
+                if i4 != 0: 
+                    for j in xrange(2,number_of_classes+1): 
+                        if mat2[l][j] >= (v + mat2[i4][j - 1]): 
+                            mat1[l][j] = i3 
+                            mat2[l][j] = v + mat2[i4][j - 1] 
+            mat1[l][1] = 1 
+            mat2[l][1] = v 
+
+        k = len(data) 
+        breaks = [0 for i in xrange(number_of_classes+1)]
+        breaks[-1] = max(data)
+        for i in reversed(xrange(2,number_of_classes+1)):
+            id = int((mat1[k][i]) - 2)
+
+            breaks[i - 1] = data[id] 
+            k = int((mat1[k][i] - 1))
         return breaks

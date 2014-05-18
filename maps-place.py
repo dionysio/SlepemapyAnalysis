@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from libs.map import Map
+from libs.map import WorldMap
 from libs.input_output import get_arguments
 
 from os import path,makedirs
@@ -9,7 +9,7 @@ from os import path,makedirs
 (items, frame, prior, codes, working_directory) = get_arguments(path.dirname(path.realpath(__file__)),True)
 
 for item in items:
-    m = Map(working_directory, frame, place_asked=int(item),codes=codes)
+    m = WorldMap(working_directory, frame, places=[int(item)],codes=codes, prior=prior)
 
 
     directory = working_directory+'/maps/place/'+item+'/'
@@ -17,4 +17,4 @@ for item in items:
         makedirs(directory)
 
     print 'Generating maps for place',item
-    m.mistaken_countries(directory=directory)
+    m.mistaken_places(directory=directory)

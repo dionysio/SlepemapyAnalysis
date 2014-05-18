@@ -68,6 +68,7 @@ def number_of_answers(frame, frequency= 'M'):
     """Returns number of answers for every time period
     """
 
+    
     result = frame.set_index(DatetimeIndex(frame.inserted))
     if frequency=='M':
         result = result.groupby(['user',lambda x: x.year,lambda x: x.month])

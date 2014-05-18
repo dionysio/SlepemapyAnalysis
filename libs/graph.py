@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 
 from drawable import Drawable
-import analysis_per_country
 import analysis_per_time
 import analysis_per_session
+import analysis_assorted
 from common import colour_range, logis
 
-from numpy import arange, ceil, log
+from numpy import arange, ceil, concatenate
+from pandas import cut
 import matplotlib.pyplot as plt
 from matplotlib import interactive
 from matplotlib import rc, rcParams
 import colorbrewer
 from os import path, makedirs
 
+
 class Graph(Drawable):
-    def __init__(self, path='', df=None, user=None, place_asked=None, prior=None, codes= None):
+    def __init__(self,path, frame, prior, codes, users=[], places=[]):
         """Sets matplotlib to be non-interactive and default font to Times New Roman. All other defaults are same as in Drawable.
         """
 
-        Drawable.__init__(self, path, df, user, place_asked, prior, codes)
+        Drawable.__init__(self,path, frame, prior, codes, users, places)
         interactive(False) #disable matplotlib interactivity
         rc('font', **{'sans-serif' : 'Times New Roman','family' : 'sans-serif'})
-        rcParams['svg.fonttype'] = 'none'
+        rcParams['svg.fonttype'] = 'none' #setting that forces matplotlib to save text in svg
 
 
     def _plot_group(self, data, ax, colour, marker):
@@ -48,8 +50,9 @@ class Graph(Drawable):
         if len(data)>1:
             fig, ax = plt.subplots()
             ax.set_xlabel('Session number')
-            ax.set_ylabel(name, color='cyan')
-            l1 = self._plot_second_axis(data, ax)
+            ax.set_ylabel(name)
+            temp = data.reset_index()
+            l1 = self._plot_second_axis(ax, x = temp.session_number, y = temp.counts)
             l2 = self._plot_group(data, ax, 'cyan', 'o')
             lines = l1+l2
             labels = [l.get_label() for l in lines]
@@ -58,8 +61,8 @@ class Graph(Drawable):
             plt.close()
 
 
-    def _plot_second_axis(self, data, first_ax, name='Log of count'):
-        """Plots second axis of log of data.counts over data.session_number. Uses symlog for yscale
+    def _plot_second_axis(self, first_ax, x, y, name='Number of users'):
+        """Plots second axis with symlog scale of data.counts over data.session_number
         
         :param data: what to plot
         :param first_ax: where to plot
@@ -69,40 +72,36 @@ class Graph(Drawable):
         ax = first_ax.twinx()
         ax.set_ylabel(name, color='red')
         ax.set_yscale('symlog')
-        return ax.plot(data['session_number'], log(data['counts']), color = 'red', linestyle='--', label='Count')
+        return ax.plot(x, y, color = 'red', linestyle='--', label='Count')
 
 
-    def response_time(self, directory=''):
-        if not directory:
-            directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_response_time(self.frame)
-        if not data.empty:
-            fig, ax = plt.subplots()
-            data = data.reset_index()
-            ax.plot(data.session_number, data.incorrect, color = 'red', label='Incorrect')
-            ax.plot(data.session_number, data.correct, color = 'green', label='Correct')
-            ax.set_yscale('symlog')
-
-            self._plot_second_axis(data, ax)
-            ax.set_title(u"Progress of mean response times over sessions")
-            ax.set_xlabel('Session number')
-            ax.set_ylabel('Mean log of response times')
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            plt.savefig(directory+'response_time.svg', bbox_inches='tight')
-            plt.close()
-
-
-    def skill(self, directory='', plot_individual_graphs = True):
-        """Draws graph of mean skill per session.
+    def separated_skill(self, directory='',threshold=None):
+        """Draws averaged separated skills.
 
         :param directory: output directory -- default is '' (current_directory)
-        :param plot_individual_graphs: whether to also draw separated graphs for each curve -- default is True
+        """
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes,threshold)
+        data.result = data.result.map(logis)
+        if not data.empty:
+            data = data.reset_index()
+            data = data.groupby(['place_map','place_type'])
+            if not path.exists(directory+'separated_skill/'):
+                makedirs(directory+'separated_skill/')
+            data.apply(lambda x: self._plot_separated_group(x, directory+'separated_skill/','Skill'))
+
+
+    def combined_skill(self, directory='',threshold=None):
+        """Draws separated skills in one graph.
+
+        :param directory: output directory -- default is '' (current_directory)
         """
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes)
-        data.result = data.result.apply(logis)
+        data = analysis_per_session.average_skill(self.frame,self.prior[0],self.codes, threshold)
+        data.result = data.result.map(logis)
         if not data.empty:
             fig, ax = plt.subplots()
 
@@ -115,16 +114,11 @@ class Graph(Drawable):
             ax.set_xlabel('Session number')
             ax.set_ylabel('Skill')
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            plt.savefig(directory+'skill.svg', bbox_inches='tight')
+            plt.savefig(directory+'combined_skill.svg', bbox_inches='tight')
             plt.close()
 
-            if plot_individual_graphs:
-                if not path.exists(directory+'skill_separated/'):
-                    makedirs(directory+'skill_separated/')
-                data.apply(lambda x: self._plot_separated_group(x, directory+'skill_separated/','Skill'))
 
-
-    def average_skill_over_session(self, directory=''):
+    def average_skill(self, directory='',threshold=None):
         """Draws graph of mean skill per session.
 
         :param directory: output directory -- default is '' (current_directory)
@@ -132,55 +126,49 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_skill(self.frame, self.prior[0], self.codes)
-        data = analysis_per_session.average_by_session(data)
-        data.result = data.result.apply(logis)
+        data = analysis_per_session.average_skill(self.frame, self.prior[0], self.codes,threshold, grpby = ['session_number'])
+        data.result = data.result.map(logis)
         if not data.empty:
             fig, ax = plt.subplots()
 
             data = data.reset_index()
             ax.plot(data.session_number, data.result, color = 'green')
+            self._plot_second_axis(ax, x=data.session_number, y = data.counts)
             ax.set_title(u"Progress of average skill over sessions")
             ax.set_xlabel('Session number')
             ax.set_ylabel('Mean skill')
 
-            plt.savefig(directory+'avg_skill_over_session.svg', bbox_inches='tight')
+            plt.savefig(directory+'average_skill.svg', bbox_inches='tight')
             plt.close()
 
 
-    def average_success_over_session(self, directory=''):
-        """Draws graph of mean success per session.
+    def separated_success(self, directory='', threshold=None):
+        """Draws averaged separated skills.
 
         :param directory: output directory -- default is '' (current_directory)
         """
-
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_success(self.frame,self.codes)
-        data = analysis_per_session.average_by_session(data)    
+        data = data = analysis_per_session.average_success(self.frame,self.codes,threshold)
+        data.result = data.result.map(logis)
         if not data.empty:
-            fig, ax = plt.subplots()
-
             data = data.reset_index()
-            ax.plot(data.session_number, data.result, color = 'green')
-            ax.set_title(u"Progress of average success rate over sessions")
-            ax.set_xlabel('Session number')
-            ax.set_ylabel('Mean success rate')
-
-            plt.savefig(directory+'avg_success_over_session.svg', bbox_inches='tight')
-            plt.close()
+            data = data.groupby(['place_map','place_type'])
+            if not path.exists(directory+'separated_success/'):
+                makedirs(directory+'separated_success/')
+            data.apply(lambda x: self._plot_separated_group(x, directory+'separated_success/','Success'))
 
 
-    def success_over_session(self,directory='', plot_individual_graphs=True):
+
+    def combined_success(self,directory='',threshold=None):
         """Draws graph of mean success per session.
 
         :param directory: output directory -- default is '' (current_directory)
-        :param plot_individual_graphs: whether to also draw separated graphs for each curve -- default is True
         """
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_session.average_success(self.frame,self.codes)
+        data = analysis_per_session.average_success(self.frame,self.codes,threshold)
         if not data.empty:
             fig, ax = plt.subplots()
 
@@ -193,13 +181,31 @@ class Graph(Drawable):
             ax.set_xlabel('Session number')
             ax.set_ylabel('Mean success rate')
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
-            plt.savefig(directory+'success_over_session.svg', bbox_inches='tight')
+            plt.savefig(directory+'combined_success.svg', bbox_inches='tight')
             plt.close()
 
-            if plot_individual_graphs:
-                if not path.exists(directory+'success_separated/'):
-                    makedirs(directory+'success_separated/')
-                data.apply(lambda x: self._plot_separated_group(x, directory+'success_separated/','Success'))
+
+    def average_success(self, directory='', threshold=None):
+        """Draws graph of mean success per session.
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.average_success(self.frame,self.codes,threshold, grpby= ['session_number'])  
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            data = data.reset_index()
+            ax.plot(data.session_number, data.result, color = 'green')
+            self._plot_second_axis(ax, x=data.session_number, y = data.counts)
+            ax.set_title(u"Progress of average success rate over sessions")
+            ax.set_xlabel('Session number')
+            ax.set_ylabel('Mean success rate')
+
+            plt.savefig(directory+'average_success.svg', bbox_inches='tight')
+            plt.close()
 
 
     def lengths_of_sessions(self, directory='',threshold=None):
@@ -217,16 +223,16 @@ class Graph(Drawable):
 
             data = data.reset_index()
             ax.bar(range(len(data)),data.result, color="cyan")
-            self._plot_second_axis(data, ax)
+            self._plot_second_axis(ax, x=data.session_number, y = data.counts)
             ax.set_title(u"Lengths of sessions over time")
             ax.set_ylabel(u"Session length [seconds]")
             ax.set_xlabel(u"Session number")
 
-            plt.savefig(directory+'lenghts_of_sessions.svg', bbox_inches='tight')
+            plt.savefig(directory+'lengths_of_sessions.svg', bbox_inches='tight')
             plt.close()
 
 
-    def number_of_answers_over_session(self, directory='',threshold=None):
+    def number_of_answers_per_session(self, directory='',threshold=None):
         """Draws graph of number of answers per session.
 
         :param threshold: how many sessions to plot
@@ -241,16 +247,16 @@ class Graph(Drawable):
 
             data = data.reset_index()
             ax.bar(range(len(data)),data.result, color="cyan")
-            self._plot_second_axis(data, ax)
-            ax.set_title(u"Number of questions over sessions")
+            self._plot_second_axis(ax, x=data.session_number, y = data.counts)
+            ax.set_title(u"Number of questions per session")
             ax.set_ylabel(u"Mean number of questions")
             ax.set_xlabel(u"Session number")
 
-            plt.savefig(directory+'number_of_answers_over_session.svg', bbox_inches='tight')
+            plt.savefig(directory+'number_of_answers_per_session.svg', bbox_inches='tight')
             plt.close()
 
 
-    def number_of_users_over_session(self, directory=''):
+    def number_of_users_per_session(self, directory=''):
         """Draws graph of number of answers per session.
 
         :param threshold: how many sessions to plot
@@ -264,11 +270,11 @@ class Graph(Drawable):
             fig, ax = plt.subplots()
 
             ax.bar(range(len(data)),data.values, color="cyan")
-            ax.set_title(u"Number of users over sessions")
+            ax.set_title(u"Number of users per session")
             ax.set_ylabel(u"Number of users")
             ax.set_xlabel(u"Session number")
 
-            plt.savefig(directory+'number_of_users_over_session.svg', bbox_inches='tight')
+            plt.savefig(directory+'number_of_users_per_session.svg', bbox_inches='tight')
             plt.close()
 
 
@@ -346,7 +352,7 @@ class Graph(Drawable):
             ax.set_xlabel(u"Date")
             ax.set_xticks(ind+width)
             ax.set_xticklabels(data.index.date)
-            fig.autofmt_xdate()
+            fig.autofmt_xdate(rotation=90,ha='center')
 
             plt.savefig(directory+'success_over_time.svg', bbox_inches='tight')
             plt.close()
@@ -374,8 +380,8 @@ class Graph(Drawable):
             ax.set_xlabel(u"Date")
             ax.set_xticks(ind+width)
             ax.set_xticklabels(data.index.date)
+            #fig.autofmt_xdate(rotation=90,ha='center')
             fig.autofmt_xdate()
-
             plt.savefig(directory+'number_of_answers_over_time.svg', bbox_inches='tight')
             plt.close()
 
@@ -402,7 +408,7 @@ class Graph(Drawable):
             ax.set_xlabel(u"Date")
             ax.set_xticks(ind+width)
             ax.set_xticklabels(data.index.date)
-            fig.autofmt_xdate()
+            fig.autofmt_xdate(rotation=90,ha='center')
 
             plt.savefig(directory+'number_of_users_over_time.svg', bbox_inches='tight')
             plt.close()
@@ -411,7 +417,7 @@ class Graph(Drawable):
 ################################################################################
 
 
-    def answer_portions(self, directory='', threshold=0.01):
+    def answers_portions(self, directory='', threshold=0.01):
         """Draws pie chart of portions of answers to specific country.
 
         :param threshold: limit of values to include as separate slice
@@ -420,12 +426,15 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_country.answer_portions(self.frame, threshold)
+        data = analysis_assorted.answer_portions(self.frame, threshold)
 
         if not data.empty:
             fig, ax = plt.subplots()
 
-            colours = colorbrewer.Paired[len(data)]
+            if len(data)<3:
+                colours = colorbrewer.Paired[3]
+            else:
+                colours = colorbrewer.Paired[len(data)]
             colours = [tuple(i/255. for i in c) for c in colours]
             labels = []
             for index,values in data.iteritems():
@@ -451,8 +460,8 @@ class Graph(Drawable):
         if not directory:
             directory = self.current_directory+'/graphs/'
         fig, ax = plt.subplots()
-        items = [logis(item[0]) for item in self.prior[0].itervalues()]
-        ax.hist(items)
+        items = [logis(-item[0]) for item in self.prior[0].itervalues()]
+        ax.hist(items,color='cyan')
         ax.set_title(u"Histogram of difficulty ")
         ax.set_ylabel(u"Number of places")
         ax.set_xlabel(u"Estimated difficulty")
@@ -470,7 +479,7 @@ class Graph(Drawable):
             directory = self.current_directory+'/graphs/'
         fig, ax = plt.subplots()
         items = [logis(item[0]) for item in self.prior[1].itervalues()]
-        ax.hist(items)
+        ax.hist(items,color='cyan')
         ax.set_title(u"Histogram of prior skill ")
         ax.set_ylabel(u"Number of users")
         ax.set_xlabel(u"Estimated prior skill")
@@ -486,18 +495,109 @@ class Graph(Drawable):
 
         if not directory:
             directory = self.current_directory+'/graphs/'
-        data = analysis_per_country.difficulty_response_time(self.frame, self.prior[0])
+        data = analysis_assorted.difficulty_response_time(self.frame, self.prior[0])
 
         if not data.empty:
             fig, ax = plt.subplots()
 
-            ax.plot(data.difficulty, log(data.correct), color='green', label='Correct')
-            ax.plot(data.difficulty, log(data.incorrect), color='red', label='Incorrect')
-            ax.set_yscale('symlog')
+            ax.plot(data.difficulty, data.correct, color='green', label='Correct')
+            ax.plot(data.difficulty, data.incorrect, color='red', label='Incorrect')
             ax.set_title(u"Mean response times of correct/incorrect answers for different difficulties")
             ax.set_xlabel(u"Difficulty")
-            ax.set_ylabel(u"Log of mean response time [ms]")
+            ax.set_ylabel(u"Mean response time [ms]")
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
             plt.savefig(directory+'difficulty_response_time.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def success_over_items(self, directory=''):
+        """Draws plot of success rate over questions
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_assorted.average_over_items(self.frame, analysis_assorted.success_over_items)
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            ax.plot(data.index, data.result, color='green')
+            self._plot_second_axis(ax, x=data.index, y = data.counts, name="Number of items")
+            ax.set_title(u"Success rate over questions")
+            ax.set_xlabel(u"Item")
+            ax.set_ylabel(u"Success rate")
+
+            plt.savefig(directory+'success_over_items.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def current_skill_over_items(self, directory=''):
+        """Draws plot of current skill rate over questions
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_assorted.average_over_items(self.frame, lambda x: analysis_assorted.current_knowledge_over_items(x, self.prior[0]))
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            ax.plot(data.index, data.result, color='green')
+            self._plot_second_axis(ax, x=data.index, y = data.counts, name="Number of items")
+            ax.set_title(u"Current skill over questions")
+            ax.set_xlabel(u"Item")
+            ax.set_ylabel(u"Current skill")
+
+            plt.savefig(directory+'current_skill_over_items.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def response_time_over_items(self, directory=''):
+        """Draws plot of response time over questions
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_assorted.average_over_items(self.frame, analysis_assorted.response_time_over_items)
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            ax.plot(data.index, data.result, color='green')
+            self._plot_second_axis(ax, x=data.index, y = data.counts, name="Number of items")
+            ax.set_title(u"Response time over questions")
+            ax.set_xlabel(u"Item")
+            ax.set_ylabel(u"Response time [ms]")
+
+            plt.savefig(directory+'response_time_over_items.svg', bbox_inches='tight')
+            plt.close()
+
+
+    def response_time_start_end(self, directory='', number_of_bins=4):
+        """Draws histogram of differences between start and the end of sessions
+
+        :param directory: output directory -- default is '' (current_directory)
+        """
+
+        if not directory:
+            directory = self.current_directory+'/graphs/'
+        data = analysis_per_session.response_time_start_end(self.frame)
+        if not data.empty:
+            fig, ax = plt.subplots()
+
+            bins = concatenate((cut(data[data<=0], number_of_bins, retbins = True)[1],cut(data[data>0], number_of_bins, retbins = True)[1]))
+            n, bins, patches = ax.hist(data,bins=bins) 
+
+            for i,patch in enumerate(patches):
+                if i<number_of_bins:
+                    patch.set_facecolor('red')
+                else:
+                    patch.set_facecolor('green')
+            ax.set_title(u"Difference in response times between start and the end of the session [ms]")
+
+            plt.savefig(directory+'response_time_start_end.svg', bbox_inches='tight')
             plt.close()

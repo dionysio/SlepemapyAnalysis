@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from common import add_session_numbers, defaultdict_factory, first_questions, logis
+from common import defaultdict_factory, first_questions, logis
 
 from collections import defaultdict
 

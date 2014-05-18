@@ -10,7 +10,8 @@ from argparse import ArgumentParser
 from os import path
 
 
-def load_answer_csv(path):
+def load_answer_csv(path, types = {'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map':float16,'ip_address':object}
+):
     """Imports answer csv into pandas DataFrame
 
     default dtypes:
@@ -28,19 +29,19 @@ def load_answer_csv(path):
     :param path: load csv from this path
     """
 
-    types = {'user':uint32,'id':uint32,'place_asked':uint16,'place_answered':float16,'type':uint8,'response_time':uint32,'number_of_options':uint8,'place_map':float16,'ip_address':object}
-    df = read_csv(path, parse_dates=[5],dtype=types,index_col='id')
+    df = read_csv(path, sep=',',parse_dates=[5],dtype=types,index_col='id')
     return df
 
 
-def load_place_csv(path):
+def load_place_csv(path, types = {'id':uint32,'code':object,'name':object,'type':uint8}):
     """Used for importing csv of places
     
     :param path: load csv from this path
     """
-
-    types = {'id':uint32,'code':object,'name':object,'type':uint8}
-    return read_csv(path,encoding='utf-8', dtype = types)
+    
+    places = read_csv(path,encoding='utf-8', dtype = types)
+    places.code = places.code.str.upper()
+    return places
 
 
 def load_ab_csv(path):
